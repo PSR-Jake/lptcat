@@ -9,18 +9,10 @@ Papa.parse("LPTs.csv", {
 
     const table = document.getElementById("lpt-table");
 
-    // --- Define column mapping explicitly (IMPORTANT) ---
-    const valueErrorMap = {
-      "R.A. (J2000)": "RA_err_ss.ss",
-      "Dec. (J2000)": "Dec_err_arcsec",
-      "DM (pc/cm^3)": "DM_err",
-      "RM (rad/m^2)": "RM_err"
-    };
-
     // Columns to hide entirely
     const hiddenColumns = new Set([
-      "RA_err_ss.ss",
-      "Dec_err_arcsec",
+      "RA_err",
+      "Dec_err",
       "DM_err",
       "RM_err",
       "Gal_l_err",
@@ -51,10 +43,24 @@ Papa.parse("LPTs.csv", {
       visibleHeaders.forEach(h => {
         const td = document.createElement("td");
 
-        // value ± error formatting
-        if (valueErrorMap[h] && row[valueErrorMap[h]]) {
-          td.textContent = `${row[h]} ± ${row[valueErrorMap[h]]}`;
-        } else {
+        // RA ± error
+        if (h === "RA" && row.RA_err) {
+          td.textContent = `${row.RA} ± ${row.RA_err}`;
+        }
+        // Dec ± error
+        else if (h === "Dec" && row.Dec_err) {
+          td.textContent = `${row.Dec} ± ${row.Dec_err}`;
+        }
+        // DM ± error
+        else if (h === "DM" && row.DM_err) {
+          td.textContent = `${row.DM} ± ${row.DM_err}`;
+        }
+        // RM ± error
+        else if (h === "RM" && row.RM_err) {
+          td.textContent = `${row.RM} ± ${row.RM_err}`;
+        }
+        // Everything else
+        else {
           td.textContent = row[h] ?? "";
         }
 
