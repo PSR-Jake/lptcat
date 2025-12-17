@@ -1,32 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>LPT-Cat – Long-Period Transient Catalogue</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
   <h1>LPT-Cat: Long-Period Transient Catalogue</h1>
 
+  <!-- Controls -->
   <div class="controls">
-    <input id="search" placeholder="Search the catalogue…" />
-    <a href="LPTs.csv" download>⬇ Download CSV</a>
+    <input
+      id="search"
+      type="text"
+      placeholder="Search the catalogue…"
+    >
+
+    <a href="LPTs.csv" download>
+      Download CSV
+    </a>
   </div>
 
+  <!-- Table -->
   <div class="table-wrapper">
     <table id="lpt-table"></table>
   </div>
 
+  <!-- Updates -->
   <h2>Recent Updates</h2>
-  <ul id="updates">
-    <li>Catalogue initial public release</li>
-    <li>Added Galactic coordinates with uncertainties</li>
-    <li>Enabled full-table search and CSV download</li>
-    <li>Clickable arXiv references</li>
-    <li>Prepared for future source additions</li>
-  </ul>
+  <ul id="updates"></ul>
 
   <a href="updates.csv">View full update history</a>
 
@@ -34,6 +38,7 @@
     Maintained by the LPT-Cat collaboration.
   </footer>
 
+  <!-- JS must be last -->
   <script src="script.js"></script>
 </body>
 </html>
