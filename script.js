@@ -1,113 +1,69 @@
-let rawData = [];
-let headers = [];
-let sortKey = null;
-let sortAsc = true;
+Papa.parse("LPTs.csv", {
+  download: true,
+  header: true,
+  skipEmptyLines: true,
+  complete: function (results) {
 
-fetch("LPTs.csv")
-  .then(res => res.text())
-  .then(text => {
-    const lines = text.trim().split("\n");
-    headers = lines[0].split(",").map(h => h.trim());
+    const headers = results.meta.fields;
+    const data = results.data;
 
-    rawData = lines.slice(1).map(line => {
-      const cols = line.split(",");
-      const obj = {};
-      headers.forEach((h, i) => {
-        obj[h] = cols[i]?.trim() || "";
+    const table = document.getElementById("lpt-table");
+
+    // --- Define column mapping explicitly (IMPORTANT) ---
+    const valueErrorMap = {
+      "R.A. (J2000)": "RA_err_ss.ss",
+      "Dec. (J2000)": "Dec_err_arcsec",
+      "DM (pc/cm^3)": "DM_err",
+      "RM (rad/m^2)": "RM_err"
+    };
+
+    // Columns to hide entirely
+    const hiddenColumns = new Set([
+      "RA_err_ss.ss",
+      "Dec_err_arcsec",
+      "DM_err",
+      "RM_err",
+      "Gal_l_err",
+      "Gal_b_err"
+    ]);
+
+    const visibleHeaders = headers.filter(h => !hiddenColumns.has(h));
+
+    // ---------- Build table header ----------
+    const thead = document.createElement("thead");
+    const trHead = document.createElement("tr");
+
+    visibleHeaders.forEach(h => {
+      const th = document.createElement("th");
+      th.textContent = h;
+      trHead.appendChild(th);
+    });
+
+    thead.appendChild(trHead);
+    table.appendChild(thead);
+
+    // ---------- Build table body ----------
+    const tbody = document.createElement("tbody");
+
+    data.forEach(row => {
+      const tr = document.createElement("tr");
+
+      visibleHeaders.forEach(h => {
+        const td = document.createElement("td");
+
+        // value ± error formatting
+        if (valueErrorMap[h] && row[valueErrorMap[h]]) {
+          td.textContent = `${row[h]} ± ${row[valueErrorMap[h]]}`;
+        } else {
+          td.textContent = row[h] ?? "";
+        }
+
+        tr.appendChild(td);
       });
-      return obj;
+
+      tbody.appendChild(tr);
     });
 
-    renderTable(rawData);
-  });
-
-function formatValue(row, key) {
-  // Integrate RA ± RA_err
-  if (key === "RA" && row["RA_err"]) {
-    return `${row.RA} ± ${row.RA_err}`;
+    table.appendChild(tbody);
   }
-
-  // Integrate Dec ± Dec_err
-  if (key === "Dec" && row["Dec_err"]) {
-    return `${row.Dec} ± ${row.Dec_err}`;
-  }
-
-  // Reference column: clickable arXiv links
-  if (key === "Reference" && row[key]) {
-    return row[key]
-      .split(";")
-      .map(r =>
-        `<a href="https://arxiv.org/abs/${r.trim()}" target="_blank">${r.trim()}</a>`
-      )
-      .join(", ");
-  }
-
-  return row[key];
-}
-
-function visibleHeaders() {
-  return headers.filter(h =>
-    !h.endsWith("_err") &&          // hide all error columns
-    h !== "Gal_l_err" &&
-    h !== "Gal_b_err"
-  );
-}
-
-function renderTable(data) {
-  const table = document.getElementById("lpt-table");
-  table.innerHTML = "";
-
-  // Header
-  const thead = document.createElement("thead");
-  const tr = document.createElement("tr");
-
-  visibleHeaders().forEach(h => {
-    const th = document.createElement("th");
-    th.textContent = h;
-    th.style.cursor = "pointer";
-    th.onclick = () => sortBy(h);
-    tr.appendChild(th);
-  });
-
-  thead.appendChild(tr);
-  table.appendChild(thead);
-
-  // Body
-  const tbody = document.createElement("tbody");
-
-  data.forEach(row => {
-    const tr = document.createElement("tr");
-    visibleHeaders().forEach(h => {
-      const td = document.createElement("td");
-      td.innerHTML = formatValue(row, h);
-      tr.appendChild(td);
-    });
-    tbody.appendChild(tr);
-  });
-
-  table.appendChild(tbody);
-}
-
-function sortBy(key) {
-  if (sortKey === key) {
-    sortAsc = !sortAsc;
-  } else {
-    sortKey = key;
-    sortAsc = true;
-  }
-
-  const sorted = [...rawData].sort((a, b) => {
-    const av = a[key] || "";
-    const bv = b[key] || "";
-
-    const na = parseFloat(av);
-    const nb = parseFloat(bv);
-
-    if (!isNaN(na) && !isNaN(nb)) {
-      return sortAsc ? na - nb : nb - na;
-    }
-    return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
-  });
-
-  renderTable(sorted);
-}
+});
