@@ -1,0 +1,112 @@
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
+export default function LPTCatApp() {
+  const [data, setData] = useState([]);
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    fetch("./LPTs.csv")
+      .then((res) => res.text())
+      .then((text) => {
+        const lines = text.split("\n").filter(Boolean);
+        const headers = lines[0].split(",");
+        const rows = lines.slice(1).map((line) => {
+          const cols = line.split(",");
+          const obj = {};
+          headers.forEach((h, i) => (obj[h.trim()] = cols[i]?.trim()));
+          return obj;
+        });
+        setData(rows);
+      });
+  }, []);
+
+  const filtered = data.filter((row) =>
+    Object.values(row).some((v) => v && v.toLowerCase().includes(query.toLowerCase()))
+  );
+
+  return (
+    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+      <h1 className="text-3xl font-bold">LPT-Cat: Long-Period Transient Catalogue</h1>
+
+      <Card>
+        <CardContent className="p-4 space-y-4">
+          <div className="flex gap-4 items-center">
+            <Input
+              placeholder="Search by name, ID, notes, or reference…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <Button asChild>
+              <a href="./LPTs.csv" download>
+                Download CSV
+              </a>
+            </Button>
+          </div>
+
+          <div className="overflow-auto rounded-xl border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {data[0] &&
+                    Object.keys(data[0]).map((key) => (
+                      <TableHead key={key} className="whitespace-nowrap">
+                        {key}
+                      </TableHead>
+                    ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((row, i) => (
+                  <TableRow key={i}>
+                    {Object.entries(row).map(([k, v]) => (
+                      <TableCell key={k} className="whitespace-nowrap">
+                        {k === "Reference" && v ? (
+                          v.split(";").map((r) => (
+                            <a
+                              key={r}
+                              href={`https://arxiv.org/abs/${r.trim()}`}
+                              target="_blank"
+                              className="text-blue-600 underline mr-2"
+                            >
+                              {r.trim()}
+                            </a>
+                          ))
+                        ) : (
+                          v
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <h2 className="text-xl font-semibold mb-2">Recent Updates</h2>
+          <ul className="list-disc pl-6 space-y-1">
+            <li>Catalogue initial public release.</li>
+            <li>Added Galactic coordinates with uncertainties.</li>
+            <li>Enabled full-table search and CSV download.</li>
+            <li>Clickable arXiv references.</li>
+            <li>Prepared for future source additions.</li>
+          </ul>
+          <Button variant="link" asChild className="mt-2">
+            <a href="./updates.csv">View full update history</a>
+          </Button>
+        </CardContent>
+      </Card>
+
+      <footer className="text-sm text-muted-foreground">
+        Maintained by the LPT-Cat collaboration. Designed for long-timescale sky exploration.
+      </footer>
+    </div>
+  );
+}
