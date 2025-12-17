@@ -182,3 +182,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   searchInput.addEventListener("input", sortAndRender);
 });
+
+/* ===== Updates ===== */
+
+fetch("updates.csv")
+  .then(r => r.text())
+  .then(text => {
+    const lines = text.trim().split("\n").slice(1);
+    const ul = document.getElementById("updates");
+
+    lines.slice(0, 5).forEach(l => {
+      const [date, desc] = l.split(",");
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${date}</strong>: ${desc}`;
+      ul.appendChild(li);
+    });
+  });
