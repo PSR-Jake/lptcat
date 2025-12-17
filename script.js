@@ -10,86 +10,120 @@ document.addEventListener("DOMContentLoaded", () => {
   let sortAsc = true;
 
   /* ===============================
-     Utility functions
+     CONFIG
   =============================== */
+  // Do not show errors for these columns
+  const IGNORE_ERROR_FOR = ["gal_l", "gal_b"];
 
-  function sexagesimalToDegrees(decStr) {
-    if (!decStr || !decStr.includes(":")) return NaN;
-    const sign = decStr.trim().startsWith("-") ? -1 : 1;
-    const parts = decStr.replace(/[+-]/, "").split(":").map(Number);
-    return sign * (parts[0] + parts[1] / 60 + parts[2] / 3600);
+  /* ===============================
+     CSV parsing (safe)
+  =============================== */
+  function parseCSVLine(line) {
+    const out = [];
+    let current = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        inQuotes = !inQuotes;
+      } else if (c === "," && !inQuotes) {
+        out.push(current.trim());
+        current = "";
+      } else {
+        current += c;
+      }
+    }
+    out.push(current.trim());
+    return out;
   }
 
-  function formatRADec(val, errArcsec, type, decVal = null) {
-    if (!val || !errArcsec || errArcsec === "-" || errArcsec === "") return val;
-
-    const err = parseFloat(errArcsec);
-    if (isNaN(err)) return val;
-
-    // Declination: arcsec uncertainty
-    if (type === "Dec") {
-      return `${val}(${err}″)`;
-    }
-
-    // Right Ascension: convert arcsec → seconds of time
-    if (type === "RA" && decVal) {
-      const decDeg = sexagesimalToDegrees(decVal);
-      if (isNaN(decDeg)) return val;
-      const errSec = err / (15 * Math.cos((decDeg * Math.PI) / 180));
-      return `${val}(${errSec.toFixed(3)}s)`;
-    }
-
-    return val;
+  /* ===============================
+     Header detection
+  =============================== */
+  function findHeader(patterns) {
+    return headers.find(h =>
+      patterns.some(p => h.toLowerCase().includes(p))
+    );
   }
 
+  function shouldIgnoreError(header) {
+    return IGNORE_ERROR_FOR.some(k =>
+      header.toLowerCase().includes(k)
+    );
+  }
+
+  /* ===============================
+     Formatting helpers
+  =============================== */
   function formatValueError(val, err) {
-    if (!val || val === "-" || !err || err === "-") return val;
+    if (!val || !err || val === "-" || err === "-") return val;
 
     const v = parseFloat(val);
     const e = parseFloat(err);
     if (isNaN(v) || isNaN(e)) return val;
 
-    const vDec = (val.split(".")[1] || "").length;
-    const eDec = (err.split(".")[1] || "").length;
-    const decimals = Math.max(vDec, eDec);
+    const d = Math.max(
+      (val.split(".")[1] || "").length,
+      (err.split(".")[1] || "").length
+    );
 
-    return `${v.toFixed(decimals)}(${e
-      .toFixed(decimals)
-      .replace(/^0\./, "")})`;
+    return `${v.toFixed(d)}(${e.toFixed(d).replace(/^0\./, "")})`;
+  }
+
+  function formatDec(val, errArcsec) {
+    if (!val || !errArcsec || errArcsec === "-") return val;
+    const e = parseFloat(errArcsec);
+    if (isNaN(e)) return val;
+    return `${val}(${e}″)`;
   }
 
   /* ===============================
-     Render table
+     Render functions
   =============================== */
+  function renderHeader(displayHeaders) {
+    thead.innerHTML = "";
+    const tr = document.createElement("tr");
 
-  function renderTable(rows) {
+    displayHeaders.forEach(h => {
+      const th = document.createElement("th");
+      th.textContent = h;
+      th.style.cursor = "pointer";
+      th.onclick = () => {
+        sortAsc = sortKey === h ? !sortAsc : true;
+        sortKey = h;
+        sortAndRender(displayHeaders);
+      };
+      tr.appendChild(th);
+    });
+
+    thead.appendChild(tr);
+  }
+
+  function renderTable(rows, displayHeaders, raCol, raErrCol, decCol, decErrCol) {
     tbody.innerHTML = "";
 
-    rows.forEach((row) => {
+    rows.forEach(row => {
       const tr = document.createElement("tr");
 
-      headers.forEach((h) => {
-        if (h.endsWith("_err")) return;
-
+      displayHeaders.forEach(h => {
         const td = document.createElement("td");
-        let value = row[h];
+        let val = row[h];
 
-        if (h === "R.A. (J2000)") {
-          value = formatRADec(
-            row[h],
-            row["R.A._err"],
-            "RA",
-            row["Dec. (J2000)"]
-          );
-        } else if (h === "Dec. (J2000)") {
-          value = formatRADec(row[h], row["Dec._err"], "Dec");
-        } else if (row[`${h}_err`]) {
-          value = formatValueError(row[h], row[`${h}_err`]);
+        if (h === raCol && row[raErrCol]) {
+          // RA errors already in seconds of time
+          val = formatValueError(val, row[raErrCol]);
+        } else if (h === decCol && row[decErrCol]) {
+          val = formatDec(val, row[decErrCol]);
+        } else if (
+          !shouldIgnoreError(h) &&
+          row[`${h}_err`]
+        ) {
+          val = formatValueError(val, row[`${h}_err`]);
         }
 
-        // Reference column → clickable arXiv links
-        if (h.toLowerCase().includes("reference") && value) {
-          value.split(";").forEach((r, i) => {
+        if (h.toLowerCase().includes("ref") && val) {
+          val.split(";").forEach(r => {
             const a = document.createElement("a");
             a.href = `https://arxiv.org/abs/${r.trim()}`;
             a.target = "_blank";
@@ -98,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
             td.appendChild(a);
           });
         } else {
-          td.textContent = value || "–";
+          td.textContent = val || "–";
         }
 
         tr.appendChild(td);
@@ -108,29 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function renderHeader() {
-    thead.innerHTML = "";
-    const tr = document.createElement("tr");
-
-    headers.forEach((h) => {
-      if (h.endsWith("_err")) return;
-
-      const th = document.createElement("th");
-      th.textContent = h;
-      th.style.cursor = "pointer";
-      th.addEventListener("click", () => {
-        sortAsc = sortKey === h ? !sortAsc : true;
-        sortKey = h;
-        sortAndRender();
-      });
-
-      tr.appendChild(th);
-    });
-
-    thead.appendChild(tr);
-  }
-
-  function sortAndRender() {
+  function sortAndRender(displayHeaders) {
     let rows = [...data];
 
     if (sortKey) {
@@ -150,37 +162,52 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const q = searchInput.value.toLowerCase();
-    rows = rows.filter((r) =>
-      Object.values(r).some((v) =>
-        v && v.toLowerCase().includes(q)
-      )
+    rows = rows.filter(r =>
+      Object.values(r).some(v => v && v.toLowerCase().includes(q))
     );
 
-    renderTable(rows);
+    renderTable(
+      rows,
+      displayHeaders,
+      raCol,
+      raErrCol,
+      decCol,
+      decErrCol
+    );
   }
 
   /* ===============================
      Load CSV
   =============================== */
+  let raCol, raErrCol, decCol, decErrCol, displayHeaders;
 
   fetch("LPTs.csv")
-    .then((res) => res.text())
-    .then((text) => {
+    .then(r => r.text())
+    .then(text => {
       const lines = text.split("\n").filter(Boolean);
-      headers = lines[0].split(",").map((h) => h.trim());
+      headers = parseCSVLine(lines[0]);
 
-      data = lines.slice(1).map((line) => {
-        const cols = line.split(",");
+      data = lines.slice(1).map(line => {
+        const cols = parseCSVLine(line);
         const obj = {};
-        headers.forEach((h, i) => (obj[h] = cols[i]?.trim()));
+        headers.forEach((h, i) => (obj[h] = cols[i]));
         return obj;
       });
 
-      renderHeader();
-      sortAndRender();
+      raCol = findHeader(["ra"]);
+      decCol = findHeader(["dec"]);
+      raErrCol = findHeader(["ra_err", "ra error", "e_ra"]);
+      decErrCol = findHeader(["dec_err", "dec error", "e_dec"]);
+
+      displayHeaders = headers.filter(
+        h => !h.toLowerCase().includes("err")
+      );
+
+      renderHeader(displayHeaders);
+      sortAndRender(displayHeaders);
     });
 
-  searchInput.addEventListener("input", sortAndRender);
+  searchInput.addEventListener("input", () => sortAndRender(displayHeaders));
 });
 
 /* ===== Updates ===== */
