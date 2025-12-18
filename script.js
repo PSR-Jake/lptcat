@@ -29,22 +29,16 @@ d3.csv("LPTs.csv").then(data => {
 function formatSci(value) {
   if (!value) return value;
 
-  // Handle upper limits like "< 1.2e-15"
-  let prefix = "";
   let v = value.toString().trim();
+  let prefix = "";
 
+  // Handle upper limits
   if (v.startsWith("<")) {
     prefix = "< ";
     v = v.replace("<", "").trim();
   }
 
-  // Match scientific notation
-  const match = v.match(/^([-+]?\d*\.?\d+)[eE]([-+]?\d+)$/);
-  if (!match) return value;
-
-  const mantissa = match[1];
-  const exponent = parseInt(match[2], 10);
-
+  // Superscript map
   const superscripts = {
     "-": "⁻",
     "0": "⁰",
@@ -59,13 +53,36 @@ function formatSci(value) {
     "9": "⁹"
   };
 
-  const expStr = exponent
-    .toString()
-    .split("")
-    .map(c => superscripts[c] || "")
-    .join("");
+  const toSuperscript = exp =>
+    exp
+      .toString()
+      .split("")
+      .map(c => superscripts[c] || "")
+      .join("");
 
-  return `${prefix}${mantissa}×10${expStr}`;
+  // ---- Case 1: 5.2(1.1)e-12 ----
+  let match = v.match(
+    /^([-+]?\d*\.?\d+)\((\d*\.?\d+)\)[eE]([-+]?\d+)$/
+  );
+
+  if (match) {
+    const val = match[1];
+    const err = match[2];
+    const exp = match[3];
+    return `${prefix}${val} ± ${err}×10${toSuperscript(exp)}`;
+  }
+
+  // ---- Case 2: 1.2e-15 ----
+  match = v.match(/^([-+]?\d*\.?\d+)[eE]([-+]?\d+)$/);
+
+  if (match) {
+    const val = match[1];
+    const exp = match[2];
+    return `${prefix}${val}×10${toSuperscript(exp)}`;
+  }
+
+  // ---- Fallback (already formatted or non-numeric) ----
+  return value;
 }
   
   // Process rows
