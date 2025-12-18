@@ -77,7 +77,7 @@ function formatSci(value) {
     if (d["Pdot_ul"] === "True") {
       pdot = "< " + formatSci(d["Pdot (s/s)"]);
     } else {
-      pdot = d["Pdot (s/s)"];
+      pdot = formatSci(d["Pdot (s/s)"]);
     }
 
     // ---- DM ± DM_err ----
