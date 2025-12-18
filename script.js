@@ -223,3 +223,15 @@ function formatSci(value) {
   renderTable(currentData);
 
 });
+
+d3.csv("updates.csv").then(updates => {
+  const list = d3.select("#update-list");
+
+  updates
+    .slice(-5)
+    .reverse()
+    .forEach(u => {
+      list.append("li")
+        .html(`<strong>${u.Date}</strong>: ${u.Description}`);
+    });
+});
