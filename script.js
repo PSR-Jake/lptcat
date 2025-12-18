@@ -39,15 +39,32 @@ d3.csv("LPTs.csv").then(data => {
     }
 
     // ---- DM ± DM_err ----
-    let dm = d["DM (pc/cm^3)"];
-    if (d["DM_err"]) {
-      dm = `${dm} ± ${d["DM_err"]}`;
+    let dm;
+    const dmVal = d["DM (pc/cm^3)"]?.trim();
+    const dmErr = d["DM_err"]?.trim();
+    
+    if (!dmVal || dmVal === "-") {
+      // Missing or unavailable DM
+      dm = dmVal || "-";
+    } else if (dmErr && dmErr !== "-") {
+      // Measured DM with uncertainty
+      dm = `${dmVal} ± ${dmErr}`;
+    } else {
+      // Measured DM but no uncertainty provided
+      dm = dmVal;
     }
 
     // ---- RM ± RM_err ----
-    let rm = d["RM (rad/m^2)"];
-    if (d["RM_err"]) {
-      rm = `${rm} ± ${d["RM_err"]}`;
+    let rm;
+    const rmVal = d["RM (rad/m^2)"]?.trim();
+    const rmErr = d["RM_err"]?.trim();
+    
+    if (!rmVal || rmVal === "-") {
+      rm = rmVal || "-";
+    } else if (rmErr && rmErr !== "-") {
+      rm = `${rmVal} ± ${rmErr}`;
+    } else {
+      rm = rmVal;
     }
 
     return {
