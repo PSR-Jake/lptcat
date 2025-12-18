@@ -30,9 +30,12 @@ d3.csv("LPTs.csv").then(data => {
   const processed = data.map(d => {
 
     // ---- Pdot combination ----
-    let pdot = d["Pdot (s/s)"];
-    if ((!pdot || pdot.trim() === "") && d["Pdot_ul"]) {
-      pdot = "< " + d["Pdot_ul"];
+    let pdot;
+    
+    if (d["Pdot_ul"] === "True") {
+      pdot = "< " + d["Pdot (s/s)"];
+    } else {
+      pdot = d["Pdot (s/s)"];
     }
 
     // ---- DM ± DM_err ----
