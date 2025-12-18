@@ -69,7 +69,7 @@ function formatSci(value) {
     const val = match[1];
     const err = match[2];
     const exp = match[3];
-    return `${prefix}${val} ± ${err}×10${toSuperscript(exp)}`;
+    return `${prefix}(${val} ± ${err})×10${toSuperscript(exp)}`;
   }
 
   // ---- Case 2: 1.2e-15 ----
