@@ -26,6 +26,48 @@ d3.csv("LPTs.csv").then(data => {
     { key: "Reference", label: "Reference" }
   ];
 
+function formatSci(value) {
+  if (!value) return value;
+
+  // Handle upper limits like "< 1.2e-15"
+  let prefix = "";
+  let v = value.toString().trim();
+
+  if (v.startsWith("<")) {
+    prefix = "< ";
+    v = v.replace("<", "").trim();
+  }
+
+  // Match scientific notation
+  const match = v.match(/^([-+]?\d*\.?\d+)[eE]([-+]?\d+)$/);
+  if (!match) return value;
+
+  const mantissa = match[1];
+  const exponent = parseInt(match[2], 10);
+
+  const superscripts = {
+    "-": "⁻",
+    "0": "⁰",
+    "1": "¹",
+    "2": "²",
+    "3": "³",
+    "4": "⁴",
+    "5": "⁵",
+    "6": "⁶",
+    "7": "⁷",
+    "8": "⁸",
+    "9": "⁹"
+  };
+
+  const expStr = exponent
+    .toString()
+    .split("")
+    .map(c => superscripts[c] || "")
+    .join("");
+
+  return `${prefix}${mantissa}×10${expStr}`;
+}
+  
   // Process rows
   const processed = data.map(d => {
 
@@ -33,7 +75,7 @@ d3.csv("LPTs.csv").then(data => {
     let pdot;
     
     if (d["Pdot_ul"] === "True") {
-      pdot = "< " + d["Pdot (s/s)"];
+      pdot = "< " + formatSci(d["Pdot (s/s)"]);
     } else {
       pdot = d["Pdot (s/s)"];
     }
