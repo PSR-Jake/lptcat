@@ -134,20 +134,92 @@ function formatSci(value) {
     };
   });
 
-  // ---- Build table header ----
+  // ---- State ----
+  let currentData = [...processed];
+  let sortState = { key: null, asc: true };
+  
+  // ---- Build table header (click to sort) ----
   const thead = d3.select("#lpt-table thead").append("tr");
+  
   columns.forEach(col => {
-    thead.append("th").text(col.label);
+    thead
+      .append("th")
+      .text(col.label)
+      .style("cursor", "pointer")
+      .on("click", () => sortBy(col.key));
   });
-
-  // ---- Build table body ----
+  
   const tbody = d3.select("#lpt-table tbody");
-
-  processed.forEach(row => {
-    const tr = tbody.append("tr");
-    columns.forEach(col => {
-      tr.append("td").html(row[col.key] ?? "");
+  
+  // ---- Render table ----
+  function renderTable(data) {
+    tbody.selectAll("tr").remove();
+  
+    data.forEach(row => {
+      const tr = tbody.append("tr");
+      columns.forEach(col => {
+        tr.append("td").html(row[col.key] ?? "");
+      });
     });
+  }
+  
+  // ---- Sorting logic ----
+  function sortBy(key) {
+    if (sortState.key === key) {
+      sortState.asc = !sortState.asc;
+    } else {
+      sortState.key = key;
+      sortState.asc = true;
+    }
+  
+    currentData.sort((a, b) => {
+      let va = a[key] ?? "";
+      let vb = b[key] ?? "";
+  
+      va = stripFormatting(va);
+      vb = stripFormatting(vb);
+  
+      const na = parseFloat(va);
+      const nb = parseFloat(vb);
+  
+      if (!isNaN(na) && !isNaN(nb)) {
+        return sortState.asc ? na - nb : nb - na;
+      }
+  
+      return sortState.asc
+        ? va.localeCompare(vb)
+        : vb.localeCompare(va);
+    });
+  
+    renderTable(currentData);
+  }
+  
+  // ---- Global search ----
+  d3.select("#searchBox").on("input", function () {
+    const term = this.value.toLowerCase();
+  
+    currentData = processed.filter(row =>
+      columns.some(col =>
+        (row[col.key] ?? "")
+          .toString()
+          .toLowerCase()
+          .includes(term)
+      )
+    );
+  
+    renderTable(currentData);
   });
+  
+  // ---- Strip formatting for numeric sorting ----
+  function stripFormatting(value) {
+    return value
+      .toString()
+      .replace(/[×±()<>]/g, "")
+      .replace(/10[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+/g, "")
+      .trim();
+  }
+  
+  // ---- Initial render ----
+  renderTable(currentData);
 
 });
