@@ -84,6 +84,35 @@ function formatSci(value) {
   // ---- Fallback (already formatted or non-numeric) ----
   return value;
 }
+
+function formatReference(ref) {
+  if (!ref || ref === "-") return ref;
+
+  const r = ref.trim();
+
+  // DOI
+  if (r.startsWith("10.")) {
+    return `<a href="https://doi.org/${r}" target="_blank">${r}</a>`;
+  }
+
+  // arXiv
+  if (r.toLowerCase().startsWith("arxiv")) {
+    const id = r.split(":")[1];
+    return `<a href="https://arxiv.org/abs/${id}" target="_blank">${r}</a>`;
+  }
+
+  // ADS bibcode (19 chars, common pattern)
+  if (r.length === 19 && r.match(/^\d{4}[A-Za-z.&]{5}\d{4}[A-Za-z]$/)) {
+    return `<a href="https://ui.adsabs.harvard.edu/abs/${r}" target="_blank">${r}</a>`;
+  }
+
+  // Already a URL
+  if (r.startsWith("http")) {
+    return `<a href="${r}" target="_blank">${r}</a>`;
+  }
+
+  return r;
+}
   
   // Process rows
   const processed = data.map(d => {
@@ -130,7 +159,8 @@ function formatSci(value) {
       ...d,
       Pdot: pdot,
       DM: dm,
-      RM: rm
+      RM: rm,
+      Reference: formatReference(d["Reference"])
     };
   });
 
