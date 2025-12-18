@@ -1,75 +1,74 @@
-Papa.parse("LPTs.csv", {
-  download: true,
-  header: true,
-  skipEmptyLines: true,
-  complete: function (results) {
+d3.csv("LPTs.csv").then(data => {
 
-    const headers = results.meta.fields;
-    const data = results.data;
+  // Columns to hide completely
+  const hiddenCols = [
+    "Gal_l_err",
+    "Gal_b_err",
+    "Pdot_ul",
+    "DM_err",
+    "RM_err"
+  ];
 
-    const table = document.getElementById("lpt-table");
+  // Output column order & labels
+  const columns = [
+    { key: "Name", label: "Name" },
+    { key: "ID", label: "ID" },
+    { key: "R.A. (J2000)", label: "R.A. (J2000)" },
+    { key: "Dec. (J2000)", label: "Dec. (J2000)" },
+    { key: "Gal_l (deg)", label: "l (deg)" },
+    { key: "Gal_b (deg)", label: "b (deg)" },
+    { key: "Period (min)", label: "Period (min)" },
+    { key: "Pdot", label: "Ṗ (s s⁻¹)" },
+    { key: "DM", label: "DM (pc cm⁻³)" },
+    { key: "RM", label: "RM (rad m⁻²)" },
+    { key: "Duty cycle", label: "Duty cycle" },
+    { key: "Notes", label: "Notes" },
+    { key: "Reference", label: "Reference" }
+  ];
 
-    // Columns to hide entirely
-    const hiddenColumns = new Set([
-      "RA_err",
-      "Dec_err",
-      "DM_err",
-      "RM_err",
-      "Gal_l_err",
-      "Gal_b_err"
-    ]);
+  // Process rows
+  const processed = data.map(d => {
 
-    const visibleHeaders = headers.filter(h => !hiddenColumns.has(h));
+    // ---- Pdot combination ----
+    let pdot = d["Pdot (s/s)"];
+    if ((!pdot || pdot.trim() === "") && d["Pdot_ul"]) {
+      pdot = "< " + d["Pdot_ul"];
+    }
 
-    // ---------- Build table header ----------
-    const thead = document.createElement("thead");
-    const trHead = document.createElement("tr");
+    // ---- DM ± DM_err ----
+    let dm = d["DM (pc/cm^3)"];
+    if (d["DM_err"]) {
+      dm = `${dm} ± ${d["DM_err"]}`;
+    }
 
-    visibleHeaders.forEach(h => {
-      const th = document.createElement("th");
-      th.textContent = h;
-      trHead.appendChild(th);
+    // ---- RM ± RM_err ----
+    let rm = d["RM (rad/m^2)"];
+    if (d["RM_err"]) {
+      rm = `${rm} ± ${d["RM_err"]}`;
+    }
+
+    return {
+      ...d,
+      Pdot: pdot,
+      DM: dm,
+      RM: rm
+    };
+  });
+
+  // ---- Build table header ----
+  const thead = d3.select("#lpt-table thead").append("tr");
+  columns.forEach(col => {
+    thead.append("th").text(col.label);
+  });
+
+  // ---- Build table body ----
+  const tbody = d3.select("#lpt-table tbody");
+
+  processed.forEach(row => {
+    const tr = tbody.append("tr");
+    columns.forEach(col => {
+      tr.append("td").html(row[col.key] ?? "");
     });
+  });
 
-    thead.appendChild(trHead);
-    table.appendChild(thead);
-
-    // ---------- Build table body ----------
-    const tbody = document.createElement("tbody");
-
-    data.forEach(row => {
-      const tr = document.createElement("tr");
-
-      visibleHeaders.forEach(h => {
-        const td = document.createElement("td");
-
-        // RA ± error
-        if (h === "RA" && row.RA_err) {
-          td.textContent = `${row.RA} ± ${row.RA_err}`;
-        }
-        // Dec ± error
-        else if (h === "Dec" && row.Dec_err) {
-          td.textContent = `${row.Dec} ± ${row.Dec_err}`;
-        }
-        // DM ± error
-        else if (h === "DM" && row.DM_err) {
-          td.textContent = `${row.DM} ± ${row.DM_err}`;
-        }
-        // RM ± error
-        else if (h === "RM" && row.RM_err) {
-          td.textContent = `${row.RM} ± ${row.RM_err}`;
-        }
-        // Everything else
-        else {
-          td.textContent = row[h] ?? "";
-        }
-
-        tr.appendChild(td);
-      });
-
-      tbody.appendChild(tr);
-    });
-
-    table.appendChild(tbody);
-  }
 });

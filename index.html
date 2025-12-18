@@ -3,68 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <title>LPT-Cat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      margin: 2rem;
+      font-family: Arial, sans-serif;
+      margin: 30px;
     }
-
-    h1 {
-      margin-bottom: 0.5rem;
-    }
-
     table {
       border-collapse: collapse;
       width: 100%;
-      font-size: 0.9rem;
+      font-size: 14px;
     }
-
     th, td {
-      border: 1px solid #ddd;
+      border: 1px solid #ccc;
       padding: 6px 8px;
-      white-space: nowrap;
+      text-align: center;
     }
-
     th {
-      background: #f4f4f4;
+      background-color: #f2f2f2;
     }
-
-    th:hover {
-      background: #eaeaea;
-    }
-
-    a {
-      color: #2563eb;
-      text-decoration: underline;
-    }
-
-    footer {
-      margin-top: 2rem;
-      font-size: 0.85rem;
-      color: #666;
+    caption {
+      caption-side: bottom;
+      text-align: left;
+      font-size: 13px;
+      margin-top: 10px;
+      color: #555;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>LPT-Cat: Long-Period Transient Catalogue</h1>
-  <p>Sortable catalogue with uncertainties integrated into values.</p>
+<h2>Long-Period Transients (LPTs)</h2>
 
-  <p>
-    <a href="LPTs.csv" download>Download full CSV</a>
-  </p>
+<table id="lpt-table">
+  <thead></thead>
+  <tbody></tbody>
+  <caption>
+    DM and RM uncertainties are shown as ±1σ. Upper limits on Ṗ are indicated when available.
+  </caption>
+</table>
 
-  <div style="overflow-x:auto;">
-    <table id="lpt-table"></table>
-  </div>
+<script src="script.js"></script>
 
-  <footer>
-    Maintained by the LPT-Cat collaboration.
-  </footer>
-
-  <script src="script.js"></script>
 </body>
 </html>
