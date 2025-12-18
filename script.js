@@ -92,7 +92,7 @@ function formatSci(value) {
     let pdot;
     
     if (d["Pdot_ul"] === "True") {
-      pdot = "< " + formatSci(d["Pdot (s/s)"]);
+      pdot = "<" + formatSci(d["Pdot (s/s)"]);
     } else {
       pdot = formatSci(d["Pdot (s/s)"]);
     }
