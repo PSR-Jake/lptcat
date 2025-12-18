@@ -259,7 +259,7 @@ d3.csv("updates.csv").then(updates => {
 
   updates
     .slice(-5)
-    .reverse()
+    // .reverse()
     .forEach(u => {
       list.append("li")
         .html(`<strong>${u.Date}</strong>: ${u.Description}`);
