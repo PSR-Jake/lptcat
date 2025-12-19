@@ -60,6 +60,19 @@ function formatReference(ref) {
   // Process rows
   const processed = data.map(d => {
 
+    // ---- Gal_l with error ----
+    let gal_l;
+    
+    const l_val = d["Gal_l (deg)"];
+    const l_err = d["Gal_l_err"];
+
+    if (!l_val || l_val ==="-") {
+      gal_l = l_val || "-";
+    } else {
+      const Scaled_l_err = l_err.toExponential().replace('.', '').replace(/e.*$/, '');
+      gal_l = '${l_val}(${Scaled_l_err})';
+    }
+
     // ---- Pdot combination ----
     let pdot = "-";
     
@@ -114,6 +127,7 @@ function formatReference(ref) {
 
     return {
       ...d,
+      Gal_l (deg): gal_l,
       Pdot: pdot,
       DM: dm,
       RM: rm,
