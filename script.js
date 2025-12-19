@@ -72,7 +72,7 @@ function formatReference(ref) {
       const sci = formatSci(d["Pdot (s/s)"], 2);
       const { mant, exp } = sci;
       const sci_err = formatSci(d["Pdot_err"], 2);
-      const { mant_err, exp_err } = sci_err;
+      const mant_err = sci_err.mant;
       pdot = `${mant}(${mant_err})×10${toSuperscript(exp)}`;
     } else {
       pdot = d["Pdot (s/s)"] || "-";
