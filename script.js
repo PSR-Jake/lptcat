@@ -5,6 +5,7 @@ d3.csv("LPTs.csv").then(data => {
     "Gal_l_err",
     "Gal_b_err",
     "Pdot_ul",
+    "Pdot_err",
     "DM_err",
     "RM_err"
   ];
@@ -26,63 +27,17 @@ d3.csv("LPTs.csv").then(data => {
     { key: "References", label: "References" }
   ];
 
-function formatSci(value) {
-  if (!value) return value;
+function toSuperscript(n) {
+  const map = { "-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹" };
+  return String(n).split("").map(c => map[c] ?? c).join("");
+}
 
-  let v = value.toString().trim();
-  let prefix = "";
+function formatSci(x, sig = 2) {
+  if (!x || x === "-" || isNaN(x)) return null;
 
-  // Handle upper limits
-  if (v.startsWith("<")) {
-    prefix = "< ";
-    v = v.replace("<", "").trim();
-  }
-
-  // Superscript map
-  const superscripts = {
-    "-": "⁻",
-    "0": "⁰",
-    "1": "¹",
-    "2": "²",
-    "3": "³",
-    "4": "⁴",
-    "5": "⁵",
-    "6": "⁶",
-    "7": "⁷",
-    "8": "⁸",
-    "9": "⁹"
-  };
-
-  const toSuperscript = exp =>
-    exp
-      .toString()
-      .split("")
-      .map(c => superscripts[c] || "")
-      .join("");
-
-  // ---- Case 1: 5.2(1.1)e-12 ----
-  let match = v.match(
-    /^([-+]?\d*\.?\d+)\((\d*\.?\d+)\)[eE]([-+]?\d+)$/
-  );
-
-  if (match) {
-    const val = match[1];
-    const err = match[2];
-    const exp = match[3];
-    return `${prefix}(${val} ± ${err})×10${toSuperscript(exp)}`;
-  }
-
-  // ---- Case 2: 1.2e-15 ----
-  match = v.match(/^([-+]?\d*\.?\d+)[eE]([-+]?\d+)$/);
-
-  if (match) {
-    const val = match[1];
-    const exp = match[2];
-    return `${prefix}${val}×10${toSuperscript(exp)}`;
-  }
-
-  // ---- Fallback (already formatted or non-numeric) ----
-  return value;
+  const exp = Math.floor(Math.log10(Math.abs(x)));
+  const mant = (x / Math.pow(10, exp)).toFixed(sig - 1);
+  return { mant, exp };
 }
 
 function formatReference(ref) {
@@ -109,8 +64,17 @@ function formatReference(ref) {
     let pdot;
     
     if (d["Pdot_ul"] === "True") {
-      pdot = "<" + formatSci(d["Pdot (s/s)"]);
-    } else {
+      const sci = formatSci(d["Pdot (s/s)"], 2);
+      const { mant, exp } = sci;
+      pdot = `&lt;${mant}×10${toSuperscript(exp)}`;
+    } else if (d["Pdot_ul"] === "False") {
+      // Detection with error
+      const sci = formatSci(d["Pdot (s/s)"], 2);
+      const { mant, exp } = sci;
+      const sci_err = formatSci(d["Pdot_err"], 2);
+      const { mant_err, exp_err } = sci_err;
+      pdot = `${mant}(${mant_err})×10${toSuperscript(exp)}`;
+    else {
       pdot = formatSci(d["Pdot (s/s)"]);
     }
 
