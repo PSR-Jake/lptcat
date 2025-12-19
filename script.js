@@ -88,30 +88,18 @@ function formatSci(value) {
 function formatReference(ref) {
   if (!ref || ref === "-") return ref;
 
-  const r = ref.trim();
+  // Split multiple references by semicolon
+  const entries = ref.split(";").map(e => e.trim()).filter(Boolean);
 
-  // DOI
-  if (r.startsWith("10.")) {
-    return `<a href="https://doi.org/${r}" target="_blank">${r}</a>`;
-  }
+  const links = entries.map(entry => {
+    // Expect format: label:arxivID
+    const [label, arxiv] = entry.split(":").map(s => s.trim());
+    if (!label || !arxiv) return entry;
 
-  // arXiv
-  if (r.toLowerCase().startsWith("arxiv")) {
-    const id = r.split(":")[1];
-    return `<a href="https://arxiv.org/abs/${id}" target="_blank">${r}</a>`;
-  }
+    return `<a href="https://arxiv.org/abs/${arxiv}" target="_blank" title="arXiv:${arxiv}">${label}</a>`;
+  });
 
-  // ADS bibcode (19 chars, common pattern)
-  if (r.length === 19 && r.match(/^\d{4}[A-Za-z.&]{5}\d{4}[A-Za-z]$/)) {
-    return `<a href="https://ui.adsabs.harvard.edu/abs/${r}" target="_blank">${r}</a>`;
-  }
-
-  // Already a URL
-  if (r.startsWith("http")) {
-    return `<a href="${r}" target="_blank">${r}</a>`;
-  }
-
-  return r;
+  return links.join(", ");
 }
   
   // Process rows
