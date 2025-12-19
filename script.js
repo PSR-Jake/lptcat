@@ -160,8 +160,8 @@ function formatReference(ref) {
 
     return {
       ...d,
-      Gal_l (deg): gal_l,
-      Gal_b (deg): gal_b,
+      ["Gal_l (deg)"]: gal_l,
+      ["Gal_b (deg)"]: gal_b,
       Pdot: pdot,
       DM: dm,
       RM: rm,
