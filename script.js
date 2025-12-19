@@ -61,21 +61,26 @@ function formatReference(ref) {
   const processed = data.map(d => {
 
     // ---- Pdot combination ----
-    let pdot;
+    let pdot = "-";
     
-    if (d["Pdot_ul"] === "True") {
-      const sci = formatSci(d["Pdot (s/s)"], 2);
+    const ul = d["Pdot_ul"];
+    const val = d["Pdot (s/s)"];
+    const err = d["Pdot_err"];
+    
+    if (val && val !== "-") {
+      const sci = formatSci(val, 2);
       const { mant, exp } = sci;
-      pdot = `&lt;${mant}×10${toSuperscript(exp)}`;
-    } else if (d["Pdot_ul"] === "False") {
-      // Detection with error
-      const sci = formatSci(d["Pdot (s/s)"], 2);
-      const { mant, exp } = sci;
-      const sci_err = formatSci(d["Pdot_err"], 2);
-      const mant_err = sci_err.mant;
-      pdot = `${mant}(${mant_err})×10${toSuperscript(exp)}`;
-    } else {
-      pdot = d["Pdot (s/s)"] || "-";
+    
+      if (ul === "True") {
+        pdot = `&lt;${mant}×10${toSuperscript(exp)}`;
+      } 
+      else if (ul === "False" && err && err !== "-") {
+        const errScaled = (parseFloat(err) / Math.pow(10, exp)).toFixed(1);
+        pdot = `${mant}(${errScaled})×10${toSuperscript(exp)}`;
+      } 
+      else {
+        pdot = `${mant}×10${toSuperscript(exp)}`;
+      }
     }
 
     // ---- DM ± DM_err ----
