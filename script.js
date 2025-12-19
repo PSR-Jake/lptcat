@@ -148,7 +148,7 @@ function formatReference(ref) {
       Pdot: pdot,
       DM: dm,
       RM: rm,
-      Reference: formatReference(d["Reference"])
+      References: formatReference(d["References"])
     };
   });
 
