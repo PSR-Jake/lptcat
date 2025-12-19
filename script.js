@@ -61,16 +61,49 @@ function formatReference(ref) {
   const processed = data.map(d => {
 
     // ---- Gal_l with error ----
-    let gal_l;
+    let gal_l = "-";
     
     const l_val = d["Gal_l (deg)"];
     const l_err = d["Gal_l_err"];
+    
+    if (l_val && l_val !== "-") {
+      if (l_err && l_err !== "-") {
+        const valStr = String(l_val);
+        const errNum = parseFloat(l_err);
+    
+        // number of decimals in the value
+        const decimals = (valStr.split(".")[1] || "").length;
+    
+        // scale error to last digit
+        const scaledErr = Math.round(errNum * Math.pow(10, decimals));
+    
+        gal_l = `${valStr}(${scaledErr})`;
+      } else {
+        gal_l = l_val;
+      }
+    }
 
-    if (!l_val || l_val ==="-") {
-      gal_l = l_val || "-";
-    } else {
-      const Scaled_l_err = l_err.toExponential().replace('.', '').replace(/e.*$/, '');
-      gal_l = '${l_val}(${Scaled_l_err})';
+    // ---- Gal_b with error ----
+    let gal_b = "-";
+    
+    const b_val = d["Gal_b (deg)"];
+    const b_err = d["Gal_b_err"];
+    
+    if (b_val && b_val !== "-") {
+      if (b_err && b_err !== "-") {
+        const valStr = String(b_val);
+        const errNum = parseFloat(b_err);
+    
+        // number of decimals in the value
+        const decimals = (valStr.split(".")[1] || "").length;
+    
+        // scale error to last digit
+        const scaledErr = Math.round(errNum * Math.pow(10, decimals));
+    
+        gal_b = `${valStr}(${scaledErr})`;
+      } else {
+        gal_b = b_val;
+      }
     }
 
     // ---- Pdot combination ----
@@ -128,6 +161,7 @@ function formatReference(ref) {
     return {
       ...d,
       Gal_l (deg): gal_l,
+      Gal_b (deg): gal_b,
       Pdot: pdot,
       DM: dm,
       RM: rm,
