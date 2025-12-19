@@ -23,7 +23,7 @@ d3.csv("LPTs.csv").then(data => {
     { key: "RM", label: "RM (rad m⁻²)" },
     { key: "Duty cycle", label: "Duty cycle" },
     { key: "Notes", label: "Notes" },
-    { key: "Reference", label: "Reference" }
+    { key: "References", label: "References" }
   ];
 
 function formatSci(value) {
