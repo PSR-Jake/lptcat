@@ -56,12 +56,14 @@ header h2 {
   max-width: 1100px;      /* same as .catalog-intro */
   margin: 30px auto 40px; /* center on page */
   text-align: center;
+  padding-top: 10px;
 }
 
 .catalog-figure img {
   width: 85%;
   max-width: 900px;      /* prevent over-stretching on large screens */
   height: auto;
+  border-radius: 6px;
 }
 
 .catalog-figure figcaption {
