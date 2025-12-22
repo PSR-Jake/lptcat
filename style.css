@@ -1,0 +1,37 @@
+body {
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  background: #fafafa;
+  color: #222;
+  margin: 0;
+  padding: 20px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+th, td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+thead th {
+  background: #f5f7fa;
+  position: sticky;
+  top: 0;
+  font-weight: 600;
+}
+
+tbody tr:hover {
+  background: #f9fbff;
+}
+
+.sort-icon {
+  font-size: 0.7em;
+  color: #999;
+  margin-left: 4px;
+}
