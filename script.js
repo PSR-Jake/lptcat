@@ -5,6 +5,7 @@ d3.csv("LPTs.csv").then(data => {
     "Gal_l_err",
     "Gal_b_err",
     "Pdot_ul",
+    "Pdot_err",
     "DM_err",
     "RM_err"
   ];
@@ -26,63 +27,17 @@ d3.csv("LPTs.csv").then(data => {
     { key: "References", label: "References" }
   ];
 
-function formatSci(value) {
-  if (!value) return value;
+function toSuperscript(n) {
+  const map = { "-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹" };
+  return String(n).split("").map(c => map[c] ?? c).join("");
+}
 
-  let v = value.toString().trim();
-  let prefix = "";
+function formatSci(x, sig = 2) {
+  if (!x || x === "-" || isNaN(x)) return null;
 
-  // Handle upper limits
-  if (v.startsWith("<")) {
-    prefix = "< ";
-    v = v.replace("<", "").trim();
-  }
-
-  // Superscript map
-  const superscripts = {
-    "-": "⁻",
-    "0": "⁰",
-    "1": "¹",
-    "2": "²",
-    "3": "³",
-    "4": "⁴",
-    "5": "⁵",
-    "6": "⁶",
-    "7": "⁷",
-    "8": "⁸",
-    "9": "⁹"
-  };
-
-  const toSuperscript = exp =>
-    exp
-      .toString()
-      .split("")
-      .map(c => superscripts[c] || "")
-      .join("");
-
-  // ---- Case 1: 5.2(1.1)e-12 ----
-  let match = v.match(
-    /^([-+]?\d*\.?\d+)\((\d*\.?\d+)\)[eE]([-+]?\d+)$/
-  );
-
-  if (match) {
-    const val = match[1];
-    const err = match[2];
-    const exp = match[3];
-    return `${prefix}(${val} ± ${err})×10${toSuperscript(exp)}`;
-  }
-
-  // ---- Case 2: 1.2e-15 ----
-  match = v.match(/^([-+]?\d*\.?\d+)[eE]([-+]?\d+)$/);
-
-  if (match) {
-    const val = match[1];
-    const exp = match[2];
-    return `${prefix}${val}×10${toSuperscript(exp)}`;
-  }
-
-  // ---- Fallback (already formatted or non-numeric) ----
-  return value;
+  const exp = Math.floor(Math.log10(Math.abs(x)));
+  const mant = (x / Math.pow(10, exp)).toFixed(sig - 1);
+  return { mant, exp };
 }
 
 function formatReference(ref) {
@@ -105,13 +60,73 @@ function formatReference(ref) {
   // Process rows
   const processed = data.map(d => {
 
-    // ---- Pdot combination ----
-    let pdot;
+    // ---- Gal_l with error ----
+    let gal_l = "-";
     
-    if (d["Pdot_ul"] === "True") {
-      pdot = "<" + formatSci(d["Pdot (s/s)"]);
-    } else {
-      pdot = formatSci(d["Pdot (s/s)"]);
+    const l_val = d["Gal_l (deg)"];
+    const l_err = d["Gal_l_err"];
+    
+    if (l_val && l_val !== "-") {
+      if (l_err && l_err !== "-") {
+        const valStr = String(l_val);
+        const errNum = parseFloat(l_err);
+    
+        // number of decimals in the value
+        const decimals = (valStr.split(".")[1] || "").length;
+    
+        // scale error to last digit
+        const scaledErr = Math.round(errNum * Math.pow(10, decimals));
+    
+        gal_l = `${valStr}(${scaledErr})`;
+      } else {
+        gal_l = l_val;
+      }
+    }
+
+    // ---- Gal_b with error ----
+    let gal_b = "-";
+    
+    const b_val = d["Gal_b (deg)"];
+    const b_err = d["Gal_b_err"];
+    
+    if (b_val && b_val !== "-") {
+      if (b_err && b_err !== "-") {
+        const valStr = String(b_val);
+        const errNum = parseFloat(b_err);
+    
+        // number of decimals in the value
+        const decimals = (valStr.split(".")[1] || "").length;
+    
+        // scale error to last digit
+        const scaledErr = Math.round(errNum * Math.pow(10, decimals));
+    
+        gal_b = `${valStr}(${scaledErr})`;
+      } else {
+        gal_b = b_val;
+      }
+    }
+
+    // ---- Pdot combination ----
+    let pdot = "-";
+    
+    const ul = d["Pdot_ul"];
+    const val = d["Pdot (s/s)"];
+    const err = d["Pdot_err"];
+    
+    if (val && val !== "-") {
+      const sci = formatSci(val, 2);
+      const { mant, exp } = sci;
+    
+      if (ul === "True") {
+        pdot = `&lt;${mant}×10${toSuperscript(exp)}`;
+      } 
+      else if (ul === "False" && err && err !== "-") {
+        const errScaled = (parseFloat(err) / Math.pow(10, exp)).toFixed(1);
+        pdot = `${mant}(${errScaled})×10${toSuperscript(exp)}`;
+      } 
+      else {
+        pdot = `${mant}×10${toSuperscript(exp)}`;
+      }
     }
 
     // ---- DM ± DM_err ----
@@ -145,6 +160,8 @@ function formatReference(ref) {
 
     return {
       ...d,
+      ["Gal_l (deg)"]: gal_l,
+      ["Gal_b (deg)"]: gal_b,
       Pdot: pdot,
       DM: dm,
       RM: rm,

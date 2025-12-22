@@ -4,83 +4,41 @@
   <meta charset="UTF-8" />
   <title>LPT-Cat</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 14px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px 8px;
-      text-align: center;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    caption {
-      caption-side: bottom;
-      text-align: left;
-      font-size: 13px;
-      margin-top: 10px;
-      color: #555;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h2>Long-Period Transients (LPTs)</h2>
+<header>
+  <h1>Long-Period Radio Transient Catalog</h1>
+</header>
 
-<section style="max-width: 900px; margin-bottom: 30px;">
+<section class="catalog-intro">
 
 <h2>About LPT-Cat</h2>
 
 <p>
-LPT-Cat is a curated catalog of <strong>Long-Period Transients (LPTs)</strong>,
-a recently emerging population of radio sources characterized by
+LPT-Cat is a curated catalog of <strong>Long-period radio transients (LPTs)</strong>,
+a myterious population of radio sources characterized by
 minute- to hour-long periodicities.
-These objects probe a largely unexplored region of neutron-star and
-stellar-transient parameter space.
-</p>
-
-<p>
-This catalog compiles published and candidate LPTs from the literature,
+This catalog compiles published LPTs from the literature,
 including their positions, periods, spin-down constraints, dispersion
 measures (DM), rotation measures (RM), and key observational notes.
-Upper limits and measurement uncertainties are presented following
-standard conventions used in astronomical catalogs.
+Upper limits and measurement uncertainties are presented as 1σ.
 </p>
 
-<p>
-LPT-Cat is designed to be:
-</p>
-
-<ul>
-  <li>🔹 <strong>Human-readable</strong> (formatted values, clickable references)</li>
-  <li>🔹 <strong>Machine-readable</strong> (CSV-based backend)</li>
-  <li>🔹 <strong>Actively maintained</strong> with transparent update history</li>
-</ul>
+<p>You can download the catalog in <a href="LPTs.csv" target="_blank">CSV version</a>.
 
 <p>
-If you use this catalog in your research, please cite the relevant discovery
-papers listed in the Reference column.
+If you find any errors or missing information, please let me know via email (zhao27[AT]tsinghua.edu.cn). 
+If you use LPT information from this catalog in your research, please cite the relevant discovery
+papers listed in the References column. Acknowledging the use of this website in your research
+paper would be appreciated. Thanks!
 </p>
 
 </section>
 
-<table id="lpt-table">
-  <thead></thead>
-  <tbody></tbody>
-  <caption>
-    DM and RM uncertainties are shown as ±1σ. Upper limits on Ṗ are indicated when available.
-  </caption>
-  
-  <input
+<input
   type="text"
   id="searchBox"
   placeholder="Search..."
@@ -91,17 +49,33 @@ papers listed in the Reference column.
     font-size: 14px;
   "
 />
-</table>
+  
+<div class="table-card">  
+  <table id="lpt-table">
+    <thead></thead>
+    <tbody></tbody>
+    <caption>
+      DM and RM uncertainties are shown as ±1σ. 1σ upper limits on Ṗ are indicated when available.
+    </caption>
+  </table>
+</div>
 
 <hr />
 
-<h3>Updates</h3>
+<div class="updates">
+  <h3>Updates</h3>
 
-<ul id="update-list"></ul>
+  <ul id="update-list"></ul>
+</div>
 
 <a href="updates.csv" target="_blank">See full update history (CSV)</a>
 
 <script src="script.js"></script>
+
+<footer>
+  <p>Maintained by <a href="https://psr-jake.github.io/index.html" target="_blank">Jiaqi (Jake) Zhao</a>.</p>
+  <p>See the <a href="https://github.com/psr-jake/lptcat" target="_blank">source code</a> on Github.</p>
+</footer>
 
 </body>
 </html>
