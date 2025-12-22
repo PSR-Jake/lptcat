@@ -1,37 +1,106 @@
 body {
   font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  margin: 40px;
   background: #fafafa;
   color: #222;
-  margin: 0;
-  padding: 20px;
+  line-height: 1.6;
 }
 
+h2, h3 {
+  margin-top: 1.5em;
+}
+
+section {
+  background: #ffffff;
+  padding: 20px 24px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+}
+
+/* ---- Search box ---- */
+.search-box {
+  margin: 20px 0 12px 0;
+  padding: 8px 10px;
+  width: 280px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* ---- Table ---- */
 table {
   border-collapse: collapse;
   width: 100%;
-  font-size: 0.95rem;
+  font-size: 14px;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.05);
 }
 
 th, td {
   padding: 8px 10px;
-  border-bottom: 1px solid #e0e0e0;
   text-align: center;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 thead th {
   background: #f5f7fa;
+  border-bottom: 2px solid #ddd;
+  font-weight: 600;
   position: sticky;
   top: 0;
-  font-weight: 600;
+  z-index: 1;
+  cursor: pointer;
+}
+
+tbody td {
+  border-bottom: 1px solid #eee;
 }
 
 tbody tr:hover {
   background: #f9fbff;
 }
 
+caption {
+  caption-side: bottom;
+  text-align: left;
+  font-size: 13px;
+  margin-top: 10px;
+  color: #555;
+}
+
+/* ---- Sorting icon ---- */
 .sort-icon {
   font-size: 0.7em;
-  color: #999;
   margin-left: 4px;
+  color: #999;
+}
+
+/* ---- Links ---- */
+a {
+  color: #2c6bed;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ---- Updates ---- */
+#update-list {
+  border-left: 3px solid #ddd;
+  padding-left: 16px;
+}
+
+#update-list li {
+  margin-bottom: 6px;
+}
+
+hr {
+  margin: 40px 0;
+  border: none;
+  border-top: 1px solid #ddd;
 }
