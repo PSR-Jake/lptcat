@@ -15,10 +15,19 @@ body {
 }
 
 header {
-  background-color: #671372;
-  color: #fff;
+  background-color: #fff;
+  color: #671372;
   padding: 15px 0;
-  text-align: center;
+  
+  /* Flexbox for horizontal layout */
+  display: flex;
+  align-items: center;      /* vertically center image and text */
+  justify-content: left;  /* center the whole header horizontally */
+  gap: 30px;                /* space between image and text */
+}
+
+#site-logo {
+  height: 250px; /* adjust size */
 }
 header h1 {
   margin: 0;
