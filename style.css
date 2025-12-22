@@ -46,7 +46,7 @@ tbody td {
 }
 
 tbody tr:hover {
-  background: #f9fbff;
+  background: #f4f8ff;
 }
 
 a {
@@ -96,3 +96,9 @@ td, th {
   white-space: nowrap;
 }
 
+caption {
+  caption-side: bottom;
+  padding-top: 8px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
