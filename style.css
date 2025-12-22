@@ -14,6 +14,24 @@ body {
   line-height: 1.6;
 }
 
+header {
+  background-color: #671372;
+  color: #fff;
+  padding: 15px 0;
+  text-align: center;
+}
+header h1 {
+  margin: 0;
+  font-size: 2.5em;
+}
+
+footer {
+    text-align: center;
+    padding: 15px 0;
+    background-color: #671372;
+    color: #030f3e;
+}
+
 .table-card {
   background: var(--bg-card);
   border-radius: 10px;
