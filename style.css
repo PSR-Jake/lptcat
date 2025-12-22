@@ -22,12 +22,12 @@ header {
   /* Flexbox for horizontal layout */
   display: flex;
   align-items: center;      /* vertically center image and text */
-  justify-content: center;  /* center the whole header horizontally */
-  gap: 10px;                /* space between image and text */
+  justify-content: left;  /* center the whole header horizontally */
+  gap: 30px;                /* space between image and text */
 }
 
 #site-logo {
-  height: 150px; /* adjust size */
+  height: 250px; /* adjust size */
 }
 header h1 {
   margin: 0;
