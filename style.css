@@ -14,6 +14,11 @@ body {
   line-height: 1.6;
 }
 
+#site-logo {
+  height: 50px; /* adjust size */
+  margin-right: 10px;
+  vertical-align: middle;
+}
 header {
   background-color: #671372;
   color: #fff;
