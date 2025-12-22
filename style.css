@@ -17,25 +17,34 @@ body {
 header {
   background-color: #fff;
   color: #671372;
-  padding: 15px 0;
-  
-  /* Flexbox for horizontal layout */
+  padding: 25px 40px;
+
   display: flex;
-  align-items: center;      /* vertically center image and text */
-  justify-content: center;  /* center the whole header horizontally */
-  gap: 30px;                /* space between image and text */
+  align-items: center;      /* vertical alignment */
+  justify-content: center;  /* center header block */
+  gap: 30px;
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 #site-logo {
-  height: 200px; /* adjust size */
+  height: 150px;
+  width: auto;
 }
+
 header h1 {
   margin: 0;
-  font-size: 2.5em;
+  font-size: 2.2em;
 }
+
 header h2 {
-  margin: 0;
-  font-size: 2.0em;
+  margin: 4px 0 0;
+  font-size: 1.4em;
+  font-weight: 500;
 }
 
 footer {
