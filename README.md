@@ -28,6 +28,7 @@ Measurement uncertainties and upper limits on spin-down rates are quoted at the 
 ---
 
 ## Repository Structure
+```
 lptcat/  
 ├── index.html          # Main webpage  
 ├── style.css           # Styling and layout  
@@ -38,7 +39,7 @@ lptcat/
 ├── lptcat-logo.png  
 ├── icon.png  
 └── README.md  
-
+```
 ---
 
 ## Usage
