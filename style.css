@@ -67,6 +67,9 @@ header h2 {
 }
 
 .catalog-figure figcaption {
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 10px;
   font-size: 0.8rem;
   color: var(--text-muted);
@@ -86,6 +89,7 @@ footer {
   box-shadow: 0 6px 18px rgba(0,0,0,0.06);
   padding: 16px;
   overflow-x: auto;
+  margin: 0 8px;
 }
 
 table {
@@ -172,7 +176,7 @@ td.ref-cell a {
 /* Compact list items */
 .updates li {
   margin-bottom: 4px;
-  line-height: 0.8; 
+  line-height: 1.0; 
 }
 
 td {
@@ -203,5 +207,49 @@ caption {
 
   .header-text {
     align-items: center;
+  }
+
+  .table-card::after {
+    content: "← scroll →";
+    display: block;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+}
+
+@media (max-width: 700px) {
+  body {
+    font-size: 15px;
+  }
+
+  header h1 {
+    font-size: 1.6em;
+  }
+
+  header h2 {
+    font-size: 1.1em;
+  }
+
+  .catalog-intro h2 {
+    font-size: 1.4rem;
+  }
+
+  .catalog-intro p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  table {
+    font-size: 0.85rem;
+  }
+
+  .updates {
+    font-size: 0.9rem;
+  }
+
+  .updates li {
+    line-height: 1.2;   /* key fix */
   }
 }
