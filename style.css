@@ -250,7 +250,7 @@ caption {
   }
 
   .updates li {
-    font-size: 0.85rem;
-    line-height: 1.2;   /* key fix */
+    font-size: 15px;
+    line-height: 1.0;   /* key fix */
   }
 }
