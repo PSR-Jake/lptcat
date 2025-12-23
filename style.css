@@ -219,6 +219,23 @@ caption {
     color: var(--text-muted);
     margin-top: 6px;
   }
+
+  .updates {
+    font-size: 0.85rem;
+  }
+
+  .updates h3 {
+    font-size: 1rem;
+  }
+
+  .updates li {
+    font-size: 0.85rem;
+    line-height: 1.25;
+  }
+
+  .updates p {
+    font-size: 0.8rem;
+  }
 }
 
 @media (max-width: 700px) {
@@ -246,13 +263,5 @@ caption {
   table {
     font-size: 0.85rem;
   }
-
-  .updates {
-    font-size: 0.1rem;
-  }
-
-  .updates li {
-    font-size: 0.1rem;
-    line-height: 1.0;   /* key fix */
-  }
 }
+
