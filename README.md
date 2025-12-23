@@ -1,6 +1,16 @@
-<p align="center">
-  <img src="lptcat-logo.png" alt="LPT-Cat logo" width="180">
-</p>
+<div align="center">
+  <table>
+    <tr>
+      <td>
+        <img src="lptcat-logo.png" alt="LPT-Cat logo" width="120">
+      </td>
+      <td style="padding-left: 15px; vertical-align: middle;">
+        <h1 style="margin: 0;">LPT-Cat</h1>
+        <p style="margin: 4px 0 0 0;">Long-Period Radio Transient Catalog</p>
+      </td>
+    </tr>
+  </table>
+</div>
 
 # LPT-Cat  
 **Long-Period Radio Transient Catalog**
