@@ -1,7 +1,7 @@
 # LPT-Cat  
 **Long-Period Radio Transient Catalog**
 
-<img src="lptcat-logo.png" alt="LPT-Cat logo" width="120">
+<img src="images/lptcat-logo.png" alt="LPT-Cat logo" width="120">
 
 LPT-Cat is a curated, literature-based catalog of **long-period radio transients (LPTs)** — a recently recognized and still mysterious population of radio sources characterized by **minute- to hour-long periodicities**.
 
