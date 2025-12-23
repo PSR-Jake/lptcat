@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="lptcat-logo.png" alt="LPT-Cat logo" width="180">
+</p>
 # LPT-Cat  
 **Long-Period Radio Transient Catalog**
 
