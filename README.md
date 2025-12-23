@@ -16,14 +16,12 @@ The catalog includes, when available:
 - Source name
 - Equatorial and Galactic coordinates (with uncertainties)
 - Spin period and spin-down constraints
-- Dispersion measure (DM)
-- Rotation measure (RM)
-- Observing facilities
+- Dispersion measure (DM) and rotation measure (RM)
+- Duty cycle
+- Notes
 - Discovery and follow-up references
-- Notes on source nature (e.g. WD–M dwarf binaries)
 
-Measurement uncertainties are quoted at the **1σ level** when available.  
-Upper limits are explicitly indicated.
+Measurement uncertainties and upper limits on spin-down rates are quoted at the **1σ level** when available.  
 
 ---
 
@@ -91,10 +89,10 @@ or open an issue / pull request on GitHub.
 ## Maintainer
 
 **Jiaqi (Jake) Zhao**  
-PhD candidate, Astronomy & Astrophysics  
+Postdoctoral Fellow 
+Tsinghua University 
 
 🔗 Personal website: https://psr-jake.github.io  
-🔗 GitHub: https://github.com/psr-jake
 
 ---
 
