@@ -1,19 +1,7 @@
-<div align="left">
-  <table>
-    <tr>
-      <td>
-        <img src="lptcat-logo.png" alt="LPT-Cat logo" width="120">
-      </td>
-      <td style="padding-left: 15px; vertical-align: middle;">
-        <h1 style="margin: 0;">LPT-Cat</h1>
-        <p style="margin: 4px 0 0 0;">Long-Period Radio Transient Catalog</p>
-      </td>
-    </tr>
-  </table>
-</div>
-
 # LPT-Cat  
 **Long-Period Radio Transient Catalog**
+
+<img src="lptcat-logo.png" alt="LPT-Cat logo" width="120">
 
 LPT-Cat is a curated, literature-based catalog of **long-period radio transients (LPTs)** — a recently recognized and still mysterious population of radio sources characterized by **minute- to hour-long periodicities**.
 
@@ -40,16 +28,16 @@ Measurement uncertainties and upper limits on spin-down rates are quoted at the 
 ---
 
 ## Repository Structure
-lptcat/
-├── index.html          # Main webpage
-├── style.css           # Styling and layout
-├── script.js           # Table rendering, search, and interactivity
-├── LPTs.csv            # Main catalog data
-├── updates.csv         # Update history
-├── lpt_distribution.png
-├── lptcat-logo.png
-├── icon.png
-└── README.md
+lptcat/  
+├── index.html          # Main webpage  
+├── style.css           # Styling and layout  
+├── script.js           # Table rendering, search, and interactivity  
+├── LPTs.csv            # Main catalog data  
+├── updates.csv         # Update history  
+├── lpt_distribution.png  
+├── lptcat-logo.png  
+├── icon.png  
+└── README.md  
 
 ---
 
@@ -59,11 +47,6 @@ lptcat/
 Simply visit the live site:
 
 👉 https://psr-jake.github.io/lptcat/
-
-The table supports:
-- Keyword search
-- Horizontal scrolling on small screens
-- Integrated uncertainties (value ± error)
 
 ### Download the data
 The full catalog is available as a CSV file:
@@ -77,9 +60,9 @@ The full catalog is available as a CSV file:
 If you use information from **LPT-Cat** in your research, please:
 
 1. **Cite the original discovery and follow-up papers** listed in the *References* column of the table.
-2. Acknowledge the use of this catalog, for example:
+2. Acknowledge the use of this catalog by giving the catalog web address (https://psr-jake.github.io/lptcat/).
 
-> “This work made use of the LPT-Cat catalog of long-period radio transients.”
+Thank you!
 
 ---
 
@@ -103,8 +86,8 @@ or open an issue / pull request on GitHub.
 ## Maintainer
 
 **Jiaqi (Jake) Zhao**  
-Postdoctoral Fellow 
-Tsinghua University 
+Postdoctoral Fellow  
+Tsinghua University  
 
 🔗 Personal website: https://psr-jake.github.io  
 
