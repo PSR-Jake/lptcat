@@ -35,7 +35,7 @@ lptcat/
 ├── script.js           # Table rendering, search, and interactivity  
 ├── LPTs.csv            # Main catalog data  
 ├── updates.csv         # Update history  
-├── LPT_plots.ipynb     # Code fot plots  
+├── LPT_plots.ipynb     # Code for plots  
 ├── images/
 └── README.md  
 ```
