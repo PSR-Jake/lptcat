@@ -281,9 +281,7 @@ caption {
   .updates p {
     font-size: 0.8rem;
   }
-}
 
-@media (max-width: 700px) {
   body {
     font-size: 15px;
   }
