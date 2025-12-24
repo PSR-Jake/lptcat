@@ -308,5 +308,10 @@ caption {
   table {
     font-size: 0.85rem;
   }
+
+  .toggle-btn:hover {
+  /* background: #eef2ff; */
+  background: var(--accent);
+}
 }
 
