@@ -43,14 +43,51 @@ papers listed in the References column. Acknowledging the use of this website in
 paper would be appreciated. Thanks!
 </p>
 
-<figure class="catalog-figure">
+<!-- <figure class="catalog-figure">
   <img src="images/lpt_distribution.png" alt="Distribution of LPTs in Galactic coordinates">
   <figcaption>
     The distribution of LPTs in the Galactic coordinates.
     Squares show LPTs that are (likely) white dwarf (WD)–M dwarf binary systems,
     while dots represent LPTs with unknown nature.
   </figcaption>
-</figure>
+</figure> -->
+
+</section>
+
+<section class="catalog-figure">
+
+  <div class="figure-toggle">
+    <button class="toggle-btn active" data-target="galactic">
+      Galactic (ℓ, b)
+    </button>
+    <button class="toggle-btn" data-target="equatorial">
+      Equatorial (RA, Dec)
+    </button>
+  </div>
+
+  <div class="figure-container">
+
+    <img
+      src="images/LPT_sky_galactic.png"
+      alt="Sky distribution of LPTs in Galactic coordinates"
+      class="sky-figure"
+      data-figure="galactic"
+    />
+
+    <img
+      src="images/LPT_sky_equatorial.png"
+      alt="Sky distribution of LPTs in equatorial coordinates"
+      class="sky-figure hidden"
+      data-figure="equatorial"
+    />
+
+  </div>
+
+  <figcaption>
+    Sky distribution of known long-period transients (LPTs).
+    The distribution is shown in Galactic (ℓ, b) and Equatorial (RA, Dec)
+    coordinate systems for comparison.
+  </figcaption>
 
 </section>
 
