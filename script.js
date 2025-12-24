@@ -27,9 +27,13 @@ d3.csv("LPTs.csv").then(data => {
     { key: "References", label: "References" }
   ];
 
-function toSuperscript(n) {
-  const map = { "-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹" };
-  return String(n).split("").map(c => map[c] ?? c).join("");
+// function toSuperscript(n) {
+//   const map = { "-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹" };
+//   return String(n).split("").map(c => map[c] ?? c).join("");
+// }
+
+function toSuperscript(exp) {
+  return `<sup>${exp}</sup>`;
 }
 
 function formatSci(x, sig = 2) {
@@ -269,4 +273,24 @@ d3.csv("updates.csv").then(updates => {
       list.append("li")
         .html(`<strong>${u.Date}</strong>: ${u.Description}`);
     });
+});
+
+document.querySelectorAll(".toggle-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+
+    // Update button state
+    document.querySelectorAll(".toggle-btn")
+      .forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const target = btn.dataset.target;
+
+    // Toggle figures
+    document.querySelectorAll(".sky-figure").forEach(img => {
+      img.classList.toggle(
+        "hidden",
+        img.dataset.figure !== target
+      );
+    });
+  });
 });
