@@ -295,7 +295,7 @@ document.querySelectorAll(".toggle-btn").forEach(btn => {
   });
 });
 
-const N_sources = d3.selectAll("#lpt-table tbody tr").size();
+// const N_sources = d3.selectAll("#lpt-table tbody tr").size();
 
-const tooltip = document.getElementById("figure-tooltip");
-tooltip.textContent = `N = ${N_sources} sources`;
+// const tooltip = document.getElementById("figure-tooltip");
+// tooltip.textContent = `N = ${N_sources} sources`;
