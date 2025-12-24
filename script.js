@@ -27,9 +27,13 @@ d3.csv("LPTs.csv").then(data => {
     { key: "References", label: "References" }
   ];
 
-function toSuperscript(n) {
-  const map = { "-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹" };
-  return String(n).split("").map(c => map[c] ?? c).join("");
+// function toSuperscript(n) {
+//   const map = { "-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹" };
+//   return String(n).split("").map(c => map[c] ?? c).join("");
+// }
+
+function toSuperscript(exp) {
+  return `<sup>${exp}</sup>`;
 }
 
 function formatSci(x, sig = 2) {
