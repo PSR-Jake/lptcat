@@ -274,3 +274,23 @@ d3.csv("updates.csv").then(updates => {
         .html(`<strong>${u.Date}</strong>: ${u.Description}`);
     });
 });
+
+document.querySelectorAll(".toggle-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+
+    // Update button state
+    document.querySelectorAll(".toggle-btn")
+      .forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const target = btn.dataset.target;
+
+    // Toggle figures
+    document.querySelectorAll(".sky-figure").forEach(img => {
+      img.classList.toggle(
+        "hidden",
+        img.dataset.figure !== target
+      );
+    });
+  });
+});
