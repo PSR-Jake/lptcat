@@ -194,6 +194,37 @@ td.ref-cell a {
   display: none;
 }
 
+.figure-info {
+  position: relative;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  cursor: default;
+  user-select: none;
+}
+
+.figure-info:hover .tooltip {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.tooltip {
+  position: absolute;
+  top: 120%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  background: #222;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
 .updates {
   max-width: 1100px;
   margin: 24px auto 12px;   /* reduced vertical spacing */
@@ -311,5 +342,15 @@ caption {
   /* background: #eef2ff; */
   background: var(--accent);
 }
+  .tooltip {
+    position: static;
+    opacity: 1;
+    transform: none;
+    background: none;
+    color: var(--text-muted);
+    box-shadow: none;
+    padding: 0;
+    margin-left: 6px;
+  }
 }
 
