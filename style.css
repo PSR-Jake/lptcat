@@ -98,6 +98,15 @@ table {
   font-size: 0.95rem;
 }
 
+th.sortable {
+  user-select: none;
+}
+
+.sort-symbol {
+  font-size: 0.8em;
+  opacity: 0.6;
+}
+
 thead th {
   position: sticky;
   top: 0;
