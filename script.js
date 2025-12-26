@@ -12,20 +12,20 @@ d3.csv("LPTs.csv").then(data => {
 
   // Output column order & labels
   const columns = [
-    { key: "Name", label: "Name" },
-    { key: "ID", label: "ID" },
-    { key: "R.A. (J2000)", label: "R.A. (J2000)" },
-    { key: "Dec. (J2000)", label: "Dec. (J2000)" },
-    { key: "Gal_l (deg)", label: "l (deg)" },
-    { key: "Gal_b (deg)", label: "b (deg)" },
-    { key: "Period (min)", label: "Period (min)" },
-    { key: "Pdot", label: "Ṗ (s s⁻¹)" },
-    { key: "DM", label: "DM (pc cm⁻³)" },
-    { key: "RM", label: "RM (rad m⁻²)" },
-    { key: "Duty cycle", label: "Duty cycle" },
-    { key: "Notes", label: "Notes" },
-    { key: "References", label: "References" }
-  ];
+  { key: "Name", label: "Name", sortable: true },
+  { key: "ID", label: "ID", sortable: true },
+  { key: "R.A. (J2000)", label: "R.A. (J2000)", sortable: true },
+  { key: "Dec. (J2000)", label: "Dec. (J2000)", sortable: true },
+  { key: "Gal_l (deg)", label: "l (deg)", sortable: true },
+  { key: "Gal_b (deg)", label: "b (deg)", sortable: true },
+  { key: "Period (min)", label: "Period (min)", sortable: true },
+  { key: "Pdot", label: "Ṗ (s s⁻¹)", sortable: false },
+  { key: "DM", label: "DM (pc cm⁻³)", sortable: true },
+  { key: "RM", label: "RM (rad m⁻²)", sortable: true },
+  { key: "Duty cycle", label: "Duty cycle", sortable: false },
+  { key: "Notes", label: "Notes", sortable: false },
+  { key: "References", label: "References", sortable: false }
+];
 
 // function toSuperscript(n) {
 //   const map = { "-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹" };
@@ -179,14 +179,37 @@ function formatReference(ref) {
   
   // ---- Build table header (click to sort) ----
   const thead = d3.select("#lpt-table thead").append("tr");
-  
+
   columns.forEach(col => {
-    thead
-      .append("th")
-      .text(col.label)
-      .style("cursor", "pointer")
-      .on("click", () => sortBy(col.key));
-  });
+    const th = thead.append("th").text(col.label);
+  
+    if (col.sortable) {
+      th
+        .classed("sortable", true)
+        .append("span")
+        .attr("class", "sort-symbol")
+        .html(" ↕");
+  
+      th
+        .style("cursor", "pointer")
+        .on("click", () => sortBy(col.key));
+  }
+});
+
+  function updateSortSymbols() {
+  d3.selectAll("th .sort-symbol").html(" ↕");
+
+  if (!sortState.key) return;
+
+  const idx = columns.findIndex(c => c.key === sortState.key);
+  if (idx < 0 || !columns[idx].sortable) return;
+
+  const symbol = sortState.asc ? " ▲" : " ▼";
+
+  d3.select(d3.selectAll("th").nodes()[idx])
+    .select(".sort-symbol")
+    .html(symbol);
+}
   
   const tbody = d3.select("#lpt-table tbody");
   
@@ -231,6 +254,7 @@ function formatReference(ref) {
     });
   
     renderTable(currentData);
+    updateSortSymbols();
   }
   
   // ---- Global search ----
