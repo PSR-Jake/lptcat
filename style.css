@@ -103,8 +103,13 @@ th.sortable {
 }
 
 .sort-symbol {
-  font-size: 0.8em;
-  opacity: 0.6;
+  font-size: 0.75em;
+  opacity: 0.25;
+  margin-left: 4px;
+}
+
+.sort-symbol.active {
+  opacity: 0.9;
 }
 
 thead th {
