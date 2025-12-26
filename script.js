@@ -188,7 +188,7 @@ function formatReference(ref) {
         .classed("sortable", true)
         .append("span")
         .attr("class", "sort-symbol")
-        .html(" ⬍");
+        .html(" △▽");
   
       th
         .style("cursor", "pointer")
@@ -197,14 +197,14 @@ function formatReference(ref) {
 });
 
   function updateSortSymbols() {
-  d3.selectAll("th .sort-symbol").html(" ⬍");
+  d3.selectAll("th .sort-symbol").html(" △▽");
 
   if (!sortState.key) return;
 
   const idx = columns.findIndex(c => c.key === sortState.key);
   if (idx < 0 || !columns[idx].sortable) return;
 
-  const symbol = sortState.asc ? " ⬆" : " ⬇";
+  const symbol = sortState.asc ? " ▲" : " ▼";
 
   d3.select(d3.selectAll("th").nodes()[idx])
     .select(".sort-symbol")
