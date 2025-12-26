@@ -181,23 +181,25 @@ function formatReference(ref) {
   const thead = d3.select("#lpt-table thead").append("tr");
 
   columns.forEach(col => {
-    const th = thead.append("th").text(col.label);
-  
-    if (col.sortable) {
-      th
-        .classed("sortable", true)
-        .append("span")
-        .attr("class", "sort-symbol")
-        .html(" △▽");
-  
-      th
-        .style("cursor", "pointer")
-        .on("click", () => sortBy(col.key));
+  const th = thead.append("th").text(col.label);
+
+  if (col.sortable) {
+    th
+      .classed("sortable", true)
+      .append("span")
+      .attr("class", "sort-symbol")
+      .html(" ▲");
+
+    th
+      .style("cursor", "pointer")
+      .on("click", () => sortBy(col.key));
   }
 });
 
   function updateSortSymbols() {
-  d3.selectAll("th .sort-symbol").html(" △▽");
+  d3.selectAll("th .sort-symbol")
+    .html(" ▲")
+    .classed("active", false);
 
   if (!sortState.key) return;
 
@@ -208,7 +210,8 @@ function formatReference(ref) {
 
   d3.select(d3.selectAll("th").nodes()[idx])
     .select(".sort-symbol")
-    .html(symbol);
+    .html(symbol)
+    .classed("active", true);
 }
   
   const tbody = d3.select("#lpt-table tbody");
