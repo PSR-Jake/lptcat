@@ -47,6 +47,8 @@ const SKY_MAP_DEFINITIONS = {
   }
 };
 
+let jumpToCatalogRow = null;
+
 function positiveModulo(value, modulus) {
   return ((value % modulus) + modulus) % modulus;
 }
@@ -413,6 +415,14 @@ function renderSkyMap(mapName, points, counts) {
     hideTooltip(tooltip);
   }
 
+  function openSourceInTable(point) {
+    activateSource(point);
+
+    if (typeof jumpToCatalogRow === "function") {
+      jumpToCatalogRow(point.id);
+    }
+  }
+
   function findNearestSource(event) {
     if (isDragging) return;
 
@@ -448,14 +458,24 @@ function renderSkyMap(mapName, points, counts) {
     .on("mouseleave", deactivateSources);
 
   sources
+    .on("click", (event, point) => {
+      event.stopPropagation();
+      openSourceInTable(point);
+    })
     .on("focus", (_, point) => {
       activateSource(point);
     })
     .on("blur", deactivateSources)
-    .on("keydown", function handleSourceKey(event) {
+    .on("keydown", function handleSourceKey(event, point) {
       if (event.key === "Escape") {
         hideAllSkyMapTooltips();
         this.blur();
+        return;
+      }
+
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openSourceInTable(point);
       }
     });
 
@@ -883,6 +903,8 @@ function formatReference(ref) {
   // ---- State ----
   let currentData = [...processed];
   let sortState = { key: null, asc: true };
+  let highlightedRowTimeout = null;
+  const searchBox = d3.select("#searchBox");
   
   // ---- Build table header (click to sort) ----
   const thead = d3.select("#lpt-table thead").append("tr");
@@ -922,17 +944,114 @@ function formatReference(ref) {
 }
   
   const tbody = d3.select("#lpt-table tbody");
+
+  function makeTableRowId(sourceId) {
+    const slug = String(sourceId || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+    return `catalog-row-${slug}`;
+  }
+
+  function compareRows(a, b) {
+    if (!sortState.key) return 0;
+
+    let va = a[sortState.key] ?? "";
+    let vb = b[sortState.key] ?? "";
+
+    va = stripFormatting(va);
+    vb = stripFormatting(vb);
+
+    const na = parseFloat(va);
+    const nb = parseFloat(vb);
+
+    if (!isNaN(na) && !isNaN(nb)) {
+      return sortState.asc ? na - nb : nb - na;
+    }
+
+    return sortState.asc
+      ? va.localeCompare(vb)
+      : vb.localeCompare(va);
+  }
+
+  function getFilteredData() {
+    const term = searchBox.property("value").toLowerCase().trim();
+
+    if (!term) {
+      return [...processed];
+    }
+
+    return processed.filter(row =>
+      columns.some(col =>
+        (row[col.key] ?? "")
+          .toString()
+          .toLowerCase()
+          .includes(term)
+      )
+    );
+  }
   
   // ---- Render table ----
   function renderTable(data) {
     tbody.selectAll("tr").remove();
   
     data.forEach(row => {
-      const tr = tbody.append("tr");
+      const tr = tbody.append("tr")
+        .attr("id", makeTableRowId(row.ID))
+        .attr("data-source-id", row.ID)
+        .attr("tabindex", -1);
+
       columns.forEach(col => {
         tr.append("td").html(row[col.key] ?? "");
       });
     });
+  }
+
+  function refreshTable() {
+    currentData = getFilteredData();
+
+    if (sortState.key) {
+      currentData.sort(compareRows);
+    }
+
+    renderTable(currentData);
+    updateSortSymbols();
+  }
+
+  function highlightTableRow(rowNode) {
+    tbody.selectAll("tr").classed("is-target-row", false);
+    rowNode.classList.add("is-target-row");
+
+    if (highlightedRowTimeout) {
+      window.clearTimeout(highlightedRowTimeout);
+    }
+
+    highlightedRowTimeout = window.setTimeout(() => {
+      rowNode.classList.remove("is-target-row");
+    }, 2400);
+  }
+
+  function jumpToTableRow(sourceId) {
+    const rowId = makeTableRowId(sourceId);
+    let rowNode = document.getElementById(rowId);
+
+    if (!rowNode) {
+      if (searchBox.property("value")) {
+        searchBox.property("value", "");
+      }
+
+      refreshTable();
+      rowNode = document.getElementById(rowId);
+    }
+
+    if (!rowNode) return;
+
+    rowNode.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+    highlightTableRow(rowNode);
   }
   
   // ---- Sorting logic ----
@@ -943,44 +1062,13 @@ function formatReference(ref) {
       sortState.key = key;
       sortState.asc = true;
     }
-  
-    currentData.sort((a, b) => {
-      let va = a[key] ?? "";
-      let vb = b[key] ?? "";
-  
-      va = stripFormatting(va);
-      vb = stripFormatting(vb);
-  
-      const na = parseFloat(va);
-      const nb = parseFloat(vb);
-  
-      if (!isNaN(na) && !isNaN(nb)) {
-        return sortState.asc ? na - nb : nb - na;
-      }
-  
-      return sortState.asc
-        ? va.localeCompare(vb)
-        : vb.localeCompare(va);
-    });
-  
-    renderTable(currentData);
-    updateSortSymbols();
+
+    refreshTable();
   }
   
   // ---- Global search ----
-  d3.select("#searchBox").on("input", function () {
-    const term = this.value.toLowerCase();
-  
-    currentData = processed.filter(row =>
-      columns.some(col =>
-        (row[col.key] ?? "")
-          .toString()
-          .toLowerCase()
-          .includes(term)
-      )
-    );
-  
-    renderTable(currentData);
+  searchBox.on("input", function () {
+    refreshTable();
   });
   
   // ---- Strip formatting for numeric sorting ----
@@ -993,7 +1081,8 @@ function formatReference(ref) {
   }
   
   // ---- Initial render ----
-  renderTable(currentData);
+  refreshTable();
+  jumpToCatalogRow = jumpToTableRow;
   initializeSkyMaps(data);
 
 });
