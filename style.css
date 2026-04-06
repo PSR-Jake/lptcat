@@ -342,6 +342,16 @@ td.ref-cell a {
   font-size: 0.76rem;
 }
 
+.sky-map-grid-label {
+  fill: #4f5f77;
+  font-size: 0.74rem;
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.94);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
 .sky-map-legend-label {
   fill: #56667e;
   font-size: 0.78rem;

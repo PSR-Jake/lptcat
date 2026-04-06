@@ -134,6 +134,43 @@ function projectSkyCoordinate(lon, lat, geometry) {
   };
 }
 
+function rotateSkyCoordinate(lon, lat, rotation) {
+  const lambda = (lon * Math.PI) / 180;
+  const phi = (lat * Math.PI) / 180;
+  const lambdaRotation = (rotation.lambda * Math.PI) / 180;
+  const phiRotation = (rotation.phi * Math.PI) / 180;
+
+  const x = Math.cos(phi) * Math.cos(lambda);
+  const y = Math.cos(phi) * Math.sin(lambda);
+  const z = Math.sin(phi);
+
+  const xLongitude = x * Math.cos(lambdaRotation) - y * Math.sin(lambdaRotation);
+  const yLongitude = x * Math.sin(lambdaRotation) + y * Math.cos(lambdaRotation);
+  const zLongitude = z;
+
+  const xLatitude = xLongitude * Math.cos(phiRotation) + zLongitude * Math.sin(phiRotation);
+  const yLatitude = yLongitude;
+  const zLatitude = -xLongitude * Math.sin(phiRotation) + zLongitude * Math.cos(phiRotation);
+
+  return {
+    lon: (Math.atan2(yLatitude, xLatitude) * 180) / Math.PI,
+    lat: (Math.asin(clamp(zLatitude, -1, 1)) * 180) / Math.PI
+  };
+}
+
+function projectRotatedCoordinate(coordinates, geometry, state) {
+  const rotated = rotateSkyCoordinate(coordinates.lon, coordinates.lat, state.rotation);
+
+  return projectSkyCoordinate(rotated.lon, rotated.lat, {
+    ...geometry,
+    scale: geometry.scale * state.zoom
+  });
+}
+
+function formatLatitudeLabel(value) {
+  return `${value}°`;
+}
+
 function hideTooltip(tooltip) {
   if (!tooltip) return;
 
@@ -169,14 +206,42 @@ function positionTooltip(tooltip, stage, label, x, y) {
   tooltip.classList.toggle("below", placeBelow);
 }
 
-function buildProjectedLine(values, constant, type, geometry) {
-  return values.map(value => {
-    if (type === "meridian") {
-      return projectSkyCoordinate(constant, value, geometry);
+function buildSegmentedPath(points, geometry, zoom, lineGenerator) {
+  const horizontalThreshold = geometry.radiusX * zoom * 0.95;
+  const verticalThreshold = geometry.radiusY * zoom * 1.1;
+  const segments = [];
+  let segment = [];
+
+  points.forEach(point => {
+    if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) {
+      if (segment.length > 1) {
+        segments.push(segment);
+      }
+      segment = [];
+      return;
     }
 
-    return projectSkyCoordinate(value, constant, geometry);
+    if (segment.length > 0) {
+      const previousPoint = segment[segment.length - 1];
+      const deltaX = Math.abs(point.x - previousPoint.x);
+      const deltaY = Math.abs(point.y - previousPoint.y);
+
+      if (deltaX > horizontalThreshold || deltaY > verticalThreshold) {
+        if (segment.length > 1) {
+          segments.push(segment);
+        }
+        segment = [];
+      }
+    }
+
+    segment.push(point);
   });
+
+  if (segment.length > 1) {
+    segments.push(segment);
+  }
+
+  return segments.map(segmentPoints => lineGenerator(segmentPoints)).join(" ");
 }
 
 function renderSkyMap(mapName, points, counts) {
@@ -199,24 +264,13 @@ function renderSkyMap(mapName, points, counts) {
   const line = d3.line()
     .x(point => point.x)
     .y(point => point.y);
-
-  const projectedPoints = points.map(point => {
-    const coordinates = point[mapName];
-    const projection = projectSkyCoordinate(coordinates.lon, coordinates.lat, geometry);
-
-    return {
-      ...point,
-      ...projection
-    };
-  });
-
-  const meridianCurves = SKY_MERIDIANS.map(lon =>
-    buildProjectedLine(d3.range(-90, 91, 2), lon, "meridian", geometry)
-  );
-  const parallelCurves = SKY_PARALLELS
-    .filter(lat => lat !== 0)
-    .map(lat => buildProjectedLine(d3.range(-180, 181, 4), lat, "parallel", geometry));
-  const baselineCurve = buildProjectedLine(d3.range(-180, 181, 4), 0, "parallel", geometry);
+  const state = {
+    zoom: 1,
+    rotation: {
+      lambda: 0,
+      phi: 0
+    }
+  };
 
   svg.selectAll("*").remove();
   svg
@@ -244,31 +298,31 @@ function renderSkyMap(mapName, points, counts) {
 
   const scene = clippedViewport.append("g");
 
-  scene.selectAll(".sky-map-graticule-meridian")
-    .data(meridianCurves)
+  const meridianPaths = scene.append("g")
+    .selectAll(".sky-map-graticule-meridian")
+    .data(SKY_MERIDIANS)
     .enter()
     .append("path")
-    .attr("class", "sky-map-graticule")
-    .attr("d", curve => line(curve));
+    .attr("class", "sky-map-graticule");
 
-  scene.selectAll(".sky-map-graticule-parallel")
-    .data(parallelCurves)
+  const parallelValues = SKY_PARALLELS.filter(lat => lat !== 0);
+
+  const parallelPaths = scene.append("g")
+    .selectAll(".sky-map-graticule-parallel")
+    .data(parallelValues)
     .enter()
     .append("path")
-    .attr("class", "sky-map-graticule")
-    .attr("d", curve => line(curve));
+    .attr("class", "sky-map-graticule");
 
-  scene.append("path")
-    .attr("class", "sky-map-baseline")
-    .attr("d", line(baselineCurve));
+  const baselinePath = scene.append("path")
+    .attr("class", "sky-map-baseline");
 
   const sources = scene.append("g")
     .selectAll(".sky-map-source")
-    .data(projectedPoints, point => point.id)
+    .data(points, point => point.id)
     .enter()
     .append("g")
     .attr("class", point => `sky-map-source${point.isBinary ? " is-binary" : ""}`)
-    .attr("transform", point => `translate(${point.x}, ${point.y})`)
     .attr("data-source-id", point => point.id)
     .attr("data-source-name", point => point.name)
     .attr("tabindex", 0)
@@ -297,14 +351,17 @@ function renderSkyMap(mapName, points, counts) {
       .attr("r", 14);
   });
 
-  let currentTransform = d3.zoomIdentity;
+  const tickLabelLayer = svg.append("g");
+  const parallelLabels = svg.append("g");
+  let isDragging = false;
 
   function activateSource(point) {
     hideAllSkyMapTooltips();
     sources.classed("is-active", source => source.id === point.id);
 
-    const x = (currentTransform.applyX(point.x) / SKY_MAP_LAYOUT.width) * stage.clientWidth;
-    const y = (currentTransform.applyY(point.y) / SKY_MAP_LAYOUT.height) * stage.clientHeight;
+    const projected = projectRotatedCoordinate(point[mapName], geometry, state);
+    const x = (projected.x / SKY_MAP_LAYOUT.width) * stage.clientWidth;
+    const y = (projected.y / SKY_MAP_LAYOUT.height) * stage.clientHeight;
 
     positionTooltip(tooltip, stage, point.name, x, y);
   }
@@ -315,14 +372,17 @@ function renderSkyMap(mapName, points, counts) {
   }
 
   function findNearestSource(event) {
+    if (isDragging) return;
+
     const [pointerX, pointerY] = d3.pointer(event, svgNode);
     const pointerModeThreshold = window.matchMedia("(pointer: coarse)").matches ? 20 : 12;
     const threshold = pointerModeThreshold * (SKY_MAP_LAYOUT.width / stage.clientWidth);
     let nearestSource = null;
 
-    projectedPoints.forEach(point => {
-      const x = currentTransform.applyX(point.x);
-      const y = currentTransform.applyY(point.y);
+    points.forEach(point => {
+      const projected = projectRotatedCoordinate(point[mapName], geometry, state);
+      const x = projected.x;
+      const y = projected.y;
       const distance = Math.hypot(x - pointerX, y - pointerY);
 
       if (!nearestSource || distance < nearestSource.distance) {
@@ -350,7 +410,7 @@ function renderSkyMap(mapName, points, counts) {
       activateSource(point);
     })
     .on("blur", deactivateSources)
-    .on("keydown", function handleSourceKey(event, point) {
+    .on("keydown", function handleSourceKey(event) {
       if (event.key === "Escape") {
         hideAllSkyMapTooltips();
         this.blur();
@@ -377,16 +437,6 @@ function renderSkyMap(mapName, points, counts) {
     .attr("y", 46)
     .attr("text-anchor", "middle")
     .text(`${counts.binary} WD-M dwarf binaries | ${counts.unknown} unknown progenitors`);
-
-  svg.selectAll(".sky-map-tick-label")
-    .data(SKY_MERIDIANS)
-    .enter()
-    .append("text")
-    .attr("class", "sky-map-tick-label")
-    .attr("x", value => projectSkyCoordinate(value, 0, geometry).x)
-    .attr("y", geometry.centerY + geometry.radiusY + 25)
-    .attr("text-anchor", "middle")
-    .text(value => definition.tickLabel(value));
 
   svg.append("text")
     .attr("class", "sky-map-axis-label")
@@ -431,31 +481,145 @@ function renderSkyMap(mapName, points, counts) {
     .attr("y", 32)
     .text("WD-M dwarf");
 
-  const zoom = d3.zoom()
-    .scaleExtent([1, SKY_MAP_LAYOUT.maxZoom])
-    .extent([[0, 0], [SKY_MAP_LAYOUT.width, SKY_MAP_LAYOUT.height]])
-    .translateExtent([[-SKY_MAP_LAYOUT.width, -SKY_MAP_LAYOUT.height], [SKY_MAP_LAYOUT.width * 2, SKY_MAP_LAYOUT.height * 2]])
+  function buildCurve(constant, type) {
+    const values = type === "meridian"
+      ? d3.range(-90, 91, 2)
+      : d3.range(-180, 181, 4);
+
+    return values.map(value => {
+      const coordinates = type === "meridian"
+        ? { lon: constant, lat: value }
+        : { lon: value, lat: constant };
+
+      return projectRotatedCoordinate(coordinates, geometry, state);
+    });
+  }
+
+  function buildLongitudeLabelData() {
+    return SKY_MERIDIANS
+      .map(value => {
+        const curve = buildCurve(value, "meridian");
+        const bottomPoint = curve.reduce((best, point) => (
+          !best || point.y > best.y ? point : best
+        ), null);
+
+        if (!bottomPoint) return null;
+
+        return {
+          value,
+          x: clamp(bottomPoint.x, SKY_MAP_LAYOUT.margin.left, SKY_MAP_LAYOUT.width - SKY_MAP_LAYOUT.margin.right),
+          y: geometry.centerY + geometry.radiusY + 25
+        };
+      })
+      .filter(Boolean);
+  }
+
+  function buildLatitudeLabelData() {
+    return SKY_PARALLELS.map(value => {
+      const curve = buildCurve(value, "parallel");
+      const leftPoint = curve.reduce((best, point) => (
+        !best || point.x < best.x ? point : best
+      ), null);
+
+      if (!leftPoint) return null;
+
+      return {
+        value,
+        x: clamp(leftPoint.x - 12, 18, SKY_MAP_LAYOUT.width - 18),
+        y: clamp(leftPoint.y + 4, SKY_MAP_LAYOUT.margin.top + 8, SKY_MAP_LAYOUT.height - SKY_MAP_LAYOUT.margin.bottom)
+      };
+    }).filter(Boolean);
+  }
+
+  function renderScene() {
+    const meridianData = SKY_MERIDIANS.map(value => ({
+      value,
+      curve: buildCurve(value, "meridian")
+    }));
+    const parallelData = parallelValues.map(value => ({
+      value,
+      curve: buildCurve(value, "parallel")
+    }));
+
+    meridianPaths.attr("d", item => {
+      const curve = meridianData.find(entry => entry.value === item).curve;
+      return buildSegmentedPath(curve, geometry, state.zoom, line);
+    });
+    parallelPaths.attr("d", item => {
+      const curve = parallelData.find(entry => entry.value === item).curve;
+      return buildSegmentedPath(curve, geometry, state.zoom, line);
+    });
+    baselinePath.attr("d", buildSegmentedPath(buildCurve(0, "parallel"), geometry, state.zoom, line));
+
+    sources.attr("transform", point => {
+      const projected = projectRotatedCoordinate(point[mapName], geometry, state);
+      return `translate(${projected.x}, ${projected.y})`;
+    });
+
+    const longitudeLabels = buildLongitudeLabelData();
+    const latitudeLabels = buildLatitudeLabelData();
+
+    tickLabelLayer.selectAll("text")
+      .data(longitudeLabels, item => item.value)
+      .join("text")
+      .attr("class", "sky-map-tick-label")
+      .attr("text-anchor", "middle")
+      .attr("x", item => item.x)
+      .attr("y", item => item.y)
+      .text(item => definition.tickLabel(item.value));
+
+    parallelLabels.selectAll("text")
+      .data(latitudeLabels, item => item.value)
+      .join("text")
+      .attr("class", "sky-map-grid-label")
+      .attr("text-anchor", "end")
+      .attr("x", item => item.x)
+      .attr("y", item => item.y)
+      .text(item => formatLatitudeLabel(item.value));
+
+    zoomReadout.textContent = `${state.zoom.toFixed(1)}x`;
+  }
+
+  const drag = d3.drag()
     .on("start", () => {
+      isDragging = true;
       svg.classed("is-dragging", true);
       hideAllSkyMapTooltips();
     })
-    .on("zoom", event => {
-      currentTransform = event.transform;
-      scene.attr("transform", event.transform);
-      zoomReadout.textContent = `${event.transform.k.toFixed(1)}x`;
+    .on("drag", event => {
+      const lonPerPixel = 360 / (2 * geometry.radiusX * state.zoom);
+      const latPerPixel = 180 / (2 * geometry.radiusY * state.zoom);
+
+      state.rotation.lambda = wrapLongitude(state.rotation.lambda + event.dx * lonPerPixel);
+      state.rotation.phi = clamp(state.rotation.phi + event.dy * latPerPixel, -85, 85);
+
+      renderScene();
     })
     .on("end", () => {
+      isDragging = false;
       svg.classed("is-dragging", false);
     });
 
-  svg.call(zoom).on("dblclick.zoom", null);
+  svg.call(drag);
+  svg.on("wheel", event => {
+    event.preventDefault();
+    hideAllSkyMapTooltips();
+
+    const zoomFactor = Math.exp(-event.deltaY * 0.0015);
+    state.zoom = clamp(state.zoom * zoomFactor, 1, SKY_MAP_LAYOUT.maxZoom);
+
+    renderScene();
+  }, { passive: false });
 
   resetButton.addEventListener("click", () => {
     hideAllSkyMapTooltips();
-    svg.transition()
-      .duration(350)
-      .call(zoom.transform, d3.zoomIdentity);
+    state.zoom = 1;
+    state.rotation.lambda = 0;
+    state.rotation.phi = 0;
+    renderScene();
   });
+
+  renderScene();
 }
 
 function initializeSkyMaps(rows) {
