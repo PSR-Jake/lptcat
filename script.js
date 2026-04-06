@@ -528,8 +528,6 @@ function renderSkyMap(mapName, points, counts) {
   }
 
   function buildLatitudeLabelData(parallelValues) {
-    const labelX = geometry.centerX - geometry.radiusX - 10;
-
     return parallelValues.map(value => {
       const curve = buildCurve(value, "parallel");
       const leftPoint = curve.reduce((best, point) => (
@@ -540,7 +538,7 @@ function renderSkyMap(mapName, points, counts) {
 
       return {
         value,
-        x: labelX,
+        x: clamp(leftPoint.x - 8, 14, SKY_MAP_LAYOUT.width - 14),
         y: leftPoint.y
       };
     }).filter(Boolean);
