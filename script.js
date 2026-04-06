@@ -1,146 +1,490 @@
-// Normalized hotspot positions for the current exported sky-map PNGs.
-const SKY_MAP_POINTS = {
-  galactic: [
-    { id: "LPT J1745-3009", x: 0.505959, y: 0.524319 },
-    { id: "LPT J1627-5235", x: 0.441536, y: 0.535588 },
-    { id: "LPT J1839-1031", x: 0.562684, y: 0.532646 },
-    { id: "LPT J1935+2148", x: 0.648172, y: 0.517281 },
-    { id: "LPT J1755-2527", x: 0.518706, y: 0.522214 },
-    { id: "LPT J0636+2526", x: 0.090847, y: 0.482742 },
-    { id: "LPT J1101+5521", x: 0.765709, y: 0.236412 },
-    { id: "LPT J0704-3706", x: 0.240002, y: 0.595628 },
-    { id: "LPT J1832-0911", x: 0.56371, y: 0.520927 },
-    { id: "LPT J1839-0756", x: 0.568533, y: 0.527142 },
-    { id: "LPT J1634+4450", x: 0.6502, y: 0.296833 },
-    { id: "LPT J1448-6856", x: 0.395172, y: 0.567391 },
-    { id: "LPT J1424-6126", x: 0.396015, y: 0.524359 }
-  ],
-  equatorial: [
-    { id: "LPT J1745-3009", x: 0.731172, y: 0.686857 },
-    { id: "LPT J1627-5235", x: 0.723978, y: 0.798835 },
-    { id: "LPT J1839-1031", x: 0.715619, y: 0.579952 },
-    { id: "LPT J1935+2148", x: 0.675393, y: 0.400642 },
-    { id: "LPT J1755-2527", x: 0.730851, y: 0.661805 },
-    { id: "LPT J0636+2526", x: 0.28949, y: 0.381045 },
-    { id: "LPT J1101+5521", x: 0.228492, y: 0.231194 },
-    { id: "LPT J0704-3706", x: 0.288309, y: 0.722983 },
-    { id: "LPT J1832-0911", x: 0.720371, y: 0.572529 },
-    { id: "LPT J1839-0756", x: 0.716011, y: 0.565638 },
-    { id: "LPT J1634+4450", x: 0.741853, y: 0.280995 },
-    { id: "LPT J1448-6856", x: 0.697632, y: 0.868562 },
-    { id: "LPT J1424-6126", x: 0.743203, y: 0.838206 }
-  ]
+const SKY_MAP_LAYOUT = {
+  width: 900,
+  height: 520,
+  margin: {
+    top: 42,
+    right: 60,
+    bottom: 66,
+    left: 72
+  },
+  maxZoom: 10
 };
+
+const SKY_MERIDIANS = d3.range(-150, 151, 30);
+const SKY_PARALLELS = [-60, -30, 0, 30, 60];
+
+const SKY_MAP_DEFINITIONS = {
+  galactic: {
+    xLabel: "Galactic Longitude l",
+    yLabel: "Galactic Latitude b",
+    tickLabel: value => `${value}°`,
+    coordinates(row) {
+      const lon = parseFloat(row["Gal_l (deg)"]);
+      const lat = parseFloat(row["Gal_b (deg)"]);
+
+      if (!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
+
+      return {
+        lon: wrapLongitude(lon),
+        lat
+      };
+    }
+  },
+  equatorial: {
+    xLabel: "Right Ascension (J2000)",
+    yLabel: "Declination",
+    tickLabel: value => `${positiveModulo(-value, 360) / 15}h`,
+    coordinates(row) {
+      const ra = parseRightAscension(row["R.A. (J2000)"]);
+      const dec = parseDeclination(row["Dec. (J2000)"]);
+
+      if (!Number.isFinite(ra) || !Number.isFinite(dec)) return null;
+
+      return {
+        lon: wrapLongitude(-ra),
+        lat: dec
+      };
+    }
+  }
+};
+
+function positiveModulo(value, modulus) {
+  return ((value % modulus) + modulus) % modulus;
+}
+
+function wrapLongitude(value) {
+  return positiveModulo(value + 180, 360) - 180;
+}
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
-function hideSkyOverlayState(overlay) {
-  const tooltip = overlay.querySelector(".sky-tooltip");
-  const marker = overlay.querySelector(".sky-active-marker");
+function stripMeasurement(value) {
+  return (value || "")
+    .toString()
+    .replace(/\([^)]*\)/g, "")
+    .replace(/−/g, "-")
+    .trim();
+}
+
+function parseRightAscension(value) {
+  const cleanValue = stripMeasurement(value);
+  const [hours = 0, minutes = 0, seconds = 0] = cleanValue
+    .split(":")
+    .map(Number);
+
+  return 15 * (hours + minutes / 60 + seconds / 3600);
+}
+
+function parseDeclination(value) {
+  const cleanValue = stripMeasurement(value);
+  const [degreesValue = "0", minutesValue = "0", secondsValue = "0"] = cleanValue.split(":");
+  const sign = degreesValue.trim().startsWith("-") ? -1 : 1;
+  const degrees = Math.abs(parseFloat(degreesValue));
+  const minutes = parseFloat(minutesValue);
+  const seconds = parseFloat(secondsValue);
+
+  return sign * (degrees + minutes / 60 + seconds / 3600);
+}
+
+function createSkyGeometry() {
+  const plotWidth = SKY_MAP_LAYOUT.width - SKY_MAP_LAYOUT.margin.left - SKY_MAP_LAYOUT.margin.right;
+  const plotHeight = SKY_MAP_LAYOUT.height - SKY_MAP_LAYOUT.margin.top - SKY_MAP_LAYOUT.margin.bottom;
+  const scale = Math.min(
+    plotWidth / (4 * Math.SQRT2),
+    plotHeight / (2 * Math.SQRT2)
+  );
+
+  return {
+    centerX: SKY_MAP_LAYOUT.margin.left + plotWidth / 2,
+    centerY: SKY_MAP_LAYOUT.margin.top + plotHeight / 2,
+    radiusX: 2 * Math.SQRT2 * scale,
+    radiusY: Math.SQRT2 * scale,
+    scale
+  };
+}
+
+function solveMollweideTheta(phi) {
+  if (Math.abs(Math.abs(phi) - Math.PI / 2) < 1e-8) {
+    return phi;
+  }
+
+  let theta = phi;
+
+  for (let index = 0; index < 12; index += 1) {
+    const numerator = 2 * theta + Math.sin(2 * theta) - Math.PI * Math.sin(phi);
+    const denominator = 2 + 2 * Math.cos(2 * theta);
+    theta -= numerator / denominator;
+  }
+
+  return theta;
+}
+
+function projectSkyCoordinate(lon, lat, geometry) {
+  const lambda = (lon * Math.PI) / 180;
+  const phi = (lat * Math.PI) / 180;
+  const theta = solveMollweideTheta(phi);
+  const x = (2 * Math.SQRT2 * lambda * Math.cos(theta)) / Math.PI;
+  const y = Math.SQRT2 * Math.sin(theta);
+
+  return {
+    x: geometry.centerX + x * geometry.scale,
+    y: geometry.centerY - y * geometry.scale
+  };
+}
+
+function hideTooltip(tooltip) {
+  if (!tooltip) return;
 
   tooltip.hidden = true;
   tooltip.classList.remove("below");
-  marker.hidden = true;
-  marker.classList.remove("square");
-  overlay.style.cursor = "default";
 }
 
-function showSkyOverlayState(overlay, point, xPx, yPx) {
-  const tooltip = overlay.querySelector(".sky-tooltip");
-  const marker = overlay.querySelector(".sky-active-marker");
-  const bounds = overlay.getBoundingClientRect();
+function hideAllSkyMapTooltips() {
+  document.querySelectorAll(".sky-tooltip").forEach(tooltip => {
+    hideTooltip(tooltip);
+  });
+
+  d3.selectAll(".sky-map-source").classed("is-active", false);
+}
+
+function positionTooltip(tooltip, stage, label, x, y) {
+  const bounds = stage.getBoundingClientRect();
   const padding = 12;
 
-  marker.hidden = false;
-  marker.classList.toggle("square", point.isBinary);
-  marker.style.left = `${point.x * 100}%`;
-  marker.style.top = `${point.y * 100}%`;
-
-  tooltip.textContent = point.name;
+  tooltip.textContent = label;
   tooltip.hidden = false;
 
   const tooltipHalfWidth = tooltip.offsetWidth / 2;
   const left = clamp(
-    xPx,
+    x,
     tooltipHalfWidth + padding,
     bounds.width - tooltipHalfWidth - padding
   );
-  const placeBelow = yPx < tooltip.offsetHeight + 20;
+  const placeBelow = y < tooltip.offsetHeight + 24;
 
   tooltip.style.left = `${left}px`;
-  tooltip.style.top = `${placeBelow ? yPx + 10 : yPx - 10}px`;
+  tooltip.style.top = `${placeBelow ? y + 10 : y - 10}px`;
   tooltip.classList.toggle("below", placeBelow);
-
-  overlay.style.cursor = "pointer";
 }
 
-function bindSkyOverlay(overlay, points) {
-  if (!overlay || points.length === 0) return;
+function buildProjectedLine(values, constant, type, geometry) {
+  return values.map(value => {
+    if (type === "meridian") {
+      return projectSkyCoordinate(constant, value, geometry);
+    }
 
-  function findNearestPoint(clientX, clientY) {
-    const bounds = overlay.getBoundingClientRect();
-    const xPx = clientX - bounds.left;
-    const yPx = clientY - bounds.top;
-    const threshold = window.matchMedia("(pointer: coarse)").matches ? 18 : 12;
+    return projectSkyCoordinate(value, constant, geometry);
+  });
+}
 
-    let nearest = null;
+function renderSkyMap(mapName, points, counts) {
+  const panel = document.querySelector(`.sky-panel[data-figure="${mapName}"]`);
 
-    points.forEach(point => {
-      const pointXPx = point.x * bounds.width;
-      const pointYPx = point.y * bounds.height;
-      const distance = Math.hypot(pointXPx - xPx, pointYPx - yPx);
+  if (!panel) return;
 
-      if (!nearest || distance < nearest.distance) {
-        nearest = { point, distance, xPx: pointXPx, yPx: pointYPx };
+  const svgNode = panel.querySelector(`.sky-map[data-map="${mapName}"]`);
+  const stage = panel.querySelector(".sky-map-stage");
+  const tooltip = panel.querySelector(`.sky-tooltip[data-tooltip="${mapName}"]`);
+  const zoomReadout = panel.querySelector(`.sky-map-zoom-readout[data-zoom-readout="${mapName}"]`);
+  const resetButton = panel.querySelector(`.sky-reset-btn[data-reset-map="${mapName}"]`);
+
+  if (!svgNode || !stage || !tooltip || !zoomReadout || !resetButton) return;
+
+  const definition = SKY_MAP_DEFINITIONS[mapName];
+  const geometry = createSkyGeometry();
+  const clipId = `sky-map-clip-${mapName}`;
+  const svg = d3.select(svgNode);
+  const line = d3.line()
+    .x(point => point.x)
+    .y(point => point.y);
+
+  const projectedPoints = points.map(point => {
+    const coordinates = point[mapName];
+    const projection = projectSkyCoordinate(coordinates.lon, coordinates.lat, geometry);
+
+    return {
+      ...point,
+      ...projection
+    };
+  });
+
+  const meridianCurves = SKY_MERIDIANS.map(lon =>
+    buildProjectedLine(d3.range(-90, 91, 2), lon, "meridian", geometry)
+  );
+  const parallelCurves = SKY_PARALLELS
+    .filter(lat => lat !== 0)
+    .map(lat => buildProjectedLine(d3.range(-180, 181, 4), lat, "parallel", geometry));
+  const baselineCurve = buildProjectedLine(d3.range(-180, 181, 4), 0, "parallel", geometry);
+
+  svg.selectAll("*").remove();
+  svg
+    .attr("viewBox", `0 0 ${SKY_MAP_LAYOUT.width} ${SKY_MAP_LAYOUT.height}`)
+    .attr("preserveAspectRatio", "xMidYMid meet");
+
+  svg.append("ellipse")
+    .attr("class", "sky-map-boundary-fill")
+    .attr("cx", geometry.centerX)
+    .attr("cy", geometry.centerY)
+    .attr("rx", geometry.radiusX)
+    .attr("ry", geometry.radiusY);
+
+  svg.append("defs")
+    .append("clipPath")
+    .attr("id", clipId)
+    .append("ellipse")
+    .attr("cx", geometry.centerX)
+    .attr("cy", geometry.centerY)
+    .attr("rx", geometry.radiusX)
+    .attr("ry", geometry.radiusY);
+
+  const clippedViewport = svg.append("g")
+    .attr("clip-path", `url(#${clipId})`);
+
+  const scene = clippedViewport.append("g");
+
+  scene.selectAll(".sky-map-graticule-meridian")
+    .data(meridianCurves)
+    .enter()
+    .append("path")
+    .attr("class", "sky-map-graticule")
+    .attr("d", curve => line(curve));
+
+  scene.selectAll(".sky-map-graticule-parallel")
+    .data(parallelCurves)
+    .enter()
+    .append("path")
+    .attr("class", "sky-map-graticule")
+    .attr("d", curve => line(curve));
+
+  scene.append("path")
+    .attr("class", "sky-map-baseline")
+    .attr("d", line(baselineCurve));
+
+  const sources = scene.append("g")
+    .selectAll(".sky-map-source")
+    .data(projectedPoints, point => point.id)
+    .enter()
+    .append("g")
+    .attr("class", point => `sky-map-source${point.isBinary ? " is-binary" : ""}`)
+    .attr("transform", point => `translate(${point.x}, ${point.y})`)
+    .attr("data-source-id", point => point.id)
+    .attr("data-source-name", point => point.name)
+    .attr("tabindex", 0)
+    .attr("role", "button")
+    .attr("aria-label", point => point.name);
+
+  sources.each(function appendMarker(point) {
+    const marker = d3.select(this);
+
+    if (point.isBinary) {
+      marker.append("rect")
+        .attr("class", "sky-map-source-visible")
+        .attr("x", -5.5)
+        .attr("y", -5.5)
+        .attr("width", 11)
+        .attr("height", 11)
+        .attr("rx", 2);
+    } else {
+      marker.append("circle")
+        .attr("class", "sky-map-source-visible")
+        .attr("r", 5.4);
+    }
+
+    marker.append("circle")
+      .attr("class", "sky-map-source-hit")
+      .attr("r", 14);
+  });
+
+  let currentTransform = d3.zoomIdentity;
+
+  function activateSource(point) {
+    hideAllSkyMapTooltips();
+    sources.classed("is-active", source => source.id === point.id);
+
+    const x = (currentTransform.applyX(point.x) / SKY_MAP_LAYOUT.width) * stage.clientWidth;
+    const y = (currentTransform.applyY(point.y) / SKY_MAP_LAYOUT.height) * stage.clientHeight;
+
+    positionTooltip(tooltip, stage, point.name, x, y);
+  }
+
+  function deactivateSources() {
+    sources.classed("is-active", false);
+    hideTooltip(tooltip);
+  }
+
+  function findNearestSource(event) {
+    const [pointerX, pointerY] = d3.pointer(event, svgNode);
+    const pointerModeThreshold = window.matchMedia("(pointer: coarse)").matches ? 20 : 12;
+    const threshold = pointerModeThreshold * (SKY_MAP_LAYOUT.width / stage.clientWidth);
+    let nearestSource = null;
+
+    projectedPoints.forEach(point => {
+      const x = currentTransform.applyX(point.x);
+      const y = currentTransform.applyY(point.y);
+      const distance = Math.hypot(x - pointerX, y - pointerY);
+
+      if (!nearestSource || distance < nearestSource.distance) {
+        nearestSource = {
+          point,
+          distance
+        };
       }
     });
 
-    if (!nearest || nearest.distance > threshold) {
-      hideSkyOverlayState(overlay);
+    if (!nearestSource || nearestSource.distance > threshold) {
+      deactivateSources();
       return;
     }
 
-    showSkyOverlayState(overlay, nearest.point, nearest.xPx, nearest.yPx);
+    activateSource(nearestSource.point);
   }
 
-  overlay.addEventListener("mousemove", event => {
-    findNearestPoint(event.clientX, event.clientY);
-  });
+  svg
+    .on("mousemove", findNearestSource)
+    .on("mouseleave", deactivateSources);
 
-  overlay.addEventListener("click", event => {
-    findNearestPoint(event.clientX, event.clientY);
-  });
+  sources
+    .on("focus", (_, point) => {
+      activateSource(point);
+    })
+    .on("blur", deactivateSources)
+    .on("keydown", function handleSourceKey(event, point) {
+      if (event.key === "Escape") {
+        hideAllSkyMapTooltips();
+        this.blur();
+      }
+    });
 
-  overlay.addEventListener("mouseleave", () => {
-    hideSkyOverlayState(overlay);
+  svg.append("ellipse")
+    .attr("class", "sky-map-boundary")
+    .attr("cx", geometry.centerX)
+    .attr("cy", geometry.centerY)
+    .attr("rx", geometry.radiusX)
+    .attr("ry", geometry.radiusY);
+
+  svg.append("text")
+    .attr("class", "sky-map-title")
+    .attr("x", SKY_MAP_LAYOUT.width / 2)
+    .attr("y", 28)
+    .attr("text-anchor", "middle")
+    .text(`N_LPT = ${counts.total}`);
+
+  svg.append("text")
+    .attr("class", "sky-map-subtitle")
+    .attr("x", SKY_MAP_LAYOUT.width / 2)
+    .attr("y", 46)
+    .attr("text-anchor", "middle")
+    .text(`${counts.binary} WD-M dwarf binaries | ${counts.unknown} unknown progenitors`);
+
+  svg.selectAll(".sky-map-tick-label")
+    .data(SKY_MERIDIANS)
+    .enter()
+    .append("text")
+    .attr("class", "sky-map-tick-label")
+    .attr("x", value => projectSkyCoordinate(value, 0, geometry).x)
+    .attr("y", geometry.centerY + geometry.radiusY + 25)
+    .attr("text-anchor", "middle")
+    .text(value => definition.tickLabel(value));
+
+  svg.append("text")
+    .attr("class", "sky-map-axis-label")
+    .attr("x", SKY_MAP_LAYOUT.width / 2)
+    .attr("y", SKY_MAP_LAYOUT.height - 18)
+    .attr("text-anchor", "middle")
+    .text(definition.xLabel);
+
+  svg.append("text")
+    .attr("class", "sky-map-axis-label")
+    .attr("transform", `translate(24, ${SKY_MAP_LAYOUT.height / 2}) rotate(-90)`)
+    .attr("text-anchor", "middle")
+    .text(definition.yLabel);
+
+  const legend = svg.append("g")
+    .attr("transform", `translate(${SKY_MAP_LAYOUT.width - 185}, 68)`);
+
+  legend.append("circle")
+    .attr("cx", 6)
+    .attr("cy", 6)
+    .attr("r", 5.2)
+    .attr("class", "sky-map-source-visible");
+
+  legend.append("text")
+    .attr("class", "sky-map-legend-label")
+    .attr("x", 20)
+    .attr("y", 10)
+    .text("Unknown");
+
+  legend.append("rect")
+    .attr("x", 0)
+    .attr("y", 22)
+    .attr("width", 12)
+    .attr("height", 12)
+    .attr("rx", 2)
+    .attr("class", "sky-map-source-visible")
+    .style("fill", "teal");
+
+  legend.append("text")
+    .attr("class", "sky-map-legend-label")
+    .attr("x", 20)
+    .attr("y", 32)
+    .text("WD-M dwarf");
+
+  const zoom = d3.zoom()
+    .scaleExtent([1, SKY_MAP_LAYOUT.maxZoom])
+    .extent([[0, 0], [SKY_MAP_LAYOUT.width, SKY_MAP_LAYOUT.height]])
+    .translateExtent([[-SKY_MAP_LAYOUT.width, -SKY_MAP_LAYOUT.height], [SKY_MAP_LAYOUT.width * 2, SKY_MAP_LAYOUT.height * 2]])
+    .on("start", () => {
+      svg.classed("is-dragging", true);
+      hideAllSkyMapTooltips();
+    })
+    .on("zoom", event => {
+      currentTransform = event.transform;
+      scene.attr("transform", event.transform);
+      zoomReadout.textContent = `${event.transform.k.toFixed(1)}x`;
+    })
+    .on("end", () => {
+      svg.classed("is-dragging", false);
+    });
+
+  svg.call(zoom).on("dblclick.zoom", null);
+
+  resetButton.addEventListener("click", () => {
+    hideAllSkyMapTooltips();
+    svg.transition()
+      .duration(350)
+      .call(zoom.transform, d3.zoomIdentity);
   });
 }
 
 function initializeSkyMaps(rows) {
-  const rowsById = new Map(rows.map(row => [row.ID, row]));
+  const skyPoints = rows
+    .map(row => {
+      const galactic = SKY_MAP_DEFINITIONS.galactic.coordinates(row);
+      const equatorial = SKY_MAP_DEFINITIONS.equatorial.coordinates(row);
 
-  Object.entries(SKY_MAP_POINTS).forEach(([mapName, points]) => {
-    const overlay = document.querySelector(`.sky-overlay[data-overlay="${mapName}"]`);
+      if (!galactic || !equatorial) return null;
 
-    if (!overlay) return;
+      return {
+        id: row.ID,
+        name: row.Name,
+        isBinary: /binary/i.test(row.Notes || ""),
+        galactic,
+        equatorial
+      };
+    })
+    .filter(Boolean);
 
-    const resolvedPoints = points
-      .map(point => {
-        const row = rowsById.get(point.id);
+  const counts = {
+    total: skyPoints.length,
+    binary: skyPoints.filter(point => point.isBinary).length
+  };
 
-        if (!row) return null;
+  counts.unknown = counts.total - counts.binary;
 
-        return {
-          ...point,
-          name: row.Name,
-          isBinary: /binary/i.test(row.Notes || "")
-        };
-      })
-      .filter(Boolean);
-
-    bindSkyOverlay(overlay, resolvedPoints);
+  Object.keys(SKY_MAP_DEFINITIONS).forEach(mapName => {
+    renderSkyMap(mapName, skyPoints, counts);
   });
 }
 
@@ -467,9 +811,7 @@ document.querySelectorAll(".toggle-btn").forEach(btn => {
       );
     });
 
-    document.querySelectorAll(".sky-overlay").forEach(overlay => {
-      hideSkyOverlayState(overlay);
-    });
+    hideAllSkyMapTooltips();
   });
 });
 

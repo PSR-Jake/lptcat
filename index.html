@@ -68,26 +68,44 @@ paper would be appreciated. Thanks!
   <div class="figure-container">
 
     <div class="sky-panel" data-figure="galactic">
-      <img
-        src="images/lpt_distribution_galactic.png"
-        alt="Sky distribution of LPTs in Galactic coordinates"
-        class="sky-figure"
-      />
-      <div class="sky-overlay" data-overlay="galactic">
-        <div class="sky-active-marker" hidden></div>
-        <div class="sky-tooltip" hidden></div>
+      <div class="sky-map-toolbar">
+        <span class="sky-map-hint">Drag to pan. Scroll or pinch to zoom.</span>
+        <div class="sky-map-controls">
+          <span class="sky-map-zoom-readout" data-zoom-readout="galactic">1.0x</span>
+          <button class="sky-reset-btn" type="button" data-reset-map="galactic">
+            Reset view
+          </button>
+        </div>
+      </div>
+      <div class="sky-map-stage">
+        <svg
+          class="sky-map"
+          data-map="galactic"
+          role="img"
+          aria-label="Interactive sky distribution of LPTs in Galactic coordinates"
+        ></svg>
+        <div class="sky-tooltip" data-tooltip="galactic" hidden></div>
       </div>
     </div>
 
     <div class="sky-panel hidden" data-figure="equatorial">
-      <img
-        src="images/lpt_distribution_equatorial.png"
-        alt="Sky distribution of LPTs in equatorial coordinates"
-        class="sky-figure"
-      />
-      <div class="sky-overlay" data-overlay="equatorial">
-        <div class="sky-active-marker" hidden></div>
-        <div class="sky-tooltip" hidden></div>
+      <div class="sky-map-toolbar">
+        <span class="sky-map-hint">Drag to pan. Scroll or pinch to zoom.</span>
+        <div class="sky-map-controls">
+          <span class="sky-map-zoom-readout" data-zoom-readout="equatorial">1.0x</span>
+          <button class="sky-reset-btn" type="button" data-reset-map="equatorial">
+            Reset view
+          </button>
+        </div>
+      </div>
+      <div class="sky-map-stage">
+        <svg
+          class="sky-map"
+          data-map="equatorial"
+          role="img"
+          aria-label="Interactive sky distribution of LPTs in equatorial coordinates"
+        ></svg>
+        <div class="sky-tooltip" data-tooltip="equatorial" hidden></div>
       </div>
     </div>
 
@@ -96,7 +114,7 @@ paper would be appreciated. Thanks!
   <figcaption>
     Sky distribution of known long-period transients (LPTs). Squares show LPTs that are (likely) white dwarf (WD)–M dwarf binary systems,
     while dots represent LPTs with unknown nature.
-    The distribution is shown in Galactic (ℓ, b) and Equatorial (RA, Dec). Hover over a source marker to see the corresponding LPT name.
+    The distribution is shown in Galactic (ℓ, b) and Equatorial (RA, Dec). Hover over a source marker to see the corresponding LPT name, and zoom in to inspect crowded regions.
   </figcaption>
 
 </section>
