@@ -181,6 +181,20 @@ function projectRotatedCoordinate(coordinates, geometry, state) {
   });
 }
 
+function isPointInsideEllipse(point, geometry) {
+  const normalizedX = (point.x - geometry.centerX) / geometry.radiusX;
+  const normalizedY = (point.y - geometry.centerY) / geometry.radiusY;
+
+  return normalizedX ** 2 + normalizedY ** 2 <= 1.0005;
+}
+
+function getLeftEllipseBoundaryX(y, geometry) {
+  const normalizedY = clamp((y - geometry.centerY) / geometry.radiusY, -1, 1);
+  const radialTerm = Math.max(0, 1 - normalizedY ** 2);
+
+  return geometry.centerX - geometry.radiusX * Math.sqrt(radialTerm);
+}
+
 function formatRightAscensionLabel(value) {
   const totalMinutes = Math.round((positiveModulo(-value, 360) / 15) * 60);
   const hours = Math.floor(totalMinutes / 60) % 24;
@@ -529,8 +543,9 @@ function renderSkyMap(mapName, points, counts) {
 
   function buildLatitudeLabelData(parallelValues) {
     return parallelValues.map(value => {
-      const curve = buildCurve(value, "parallel");
-      const leftPoint = curve.reduce((best, point) => (
+      const visibleCurve = buildCurve(value, "parallel")
+        .filter(point => isPointInsideEllipse(point, geometry));
+      const leftPoint = visibleCurve.reduce((best, point) => (
         !best || point.x < best.x ? point : best
       ), null);
 
@@ -538,7 +553,7 @@ function renderSkyMap(mapName, points, counts) {
 
       return {
         value,
-        x: clamp(leftPoint.x - 8, 14, SKY_MAP_LAYOUT.width - 14),
+        x: clamp(getLeftEllipseBoundaryX(leftPoint.y, geometry) - 8, 14, SKY_MAP_LAYOUT.width - 14),
         y: leftPoint.y
       };
     }).filter(Boolean);
