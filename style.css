@@ -340,6 +340,12 @@ td.ref-cell a {
 .sky-map-tick-label {
   fill: #5b6b82;
   font-size: 0.76rem;
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.94);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  pointer-events: none;
 }
 
 .sky-map-grid-label {
@@ -350,6 +356,7 @@ td.ref-cell a {
   stroke: rgba(255, 255, 255, 0.94);
   stroke-width: 3px;
   stroke-linejoin: round;
+  pointer-events: none;
 }
 
 .sky-map-legend-label {
