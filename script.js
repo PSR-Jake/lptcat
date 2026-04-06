@@ -66,6 +66,12 @@ function getAdaptiveAngularStep(zoom) {
   return 30;
 }
 
+function getLongitudeLabelLatitude(rotationPhi, step) {
+  const snappedLatitude = Math.round(rotationPhi / step) * step;
+
+  return clamp(snappedLatitude, -90 + step, 90 - step);
+}
+
 function buildMeridianValues(step) {
   return d3.range(-180 + step, 180, step);
 }
@@ -523,12 +529,12 @@ function renderSkyMap(mapName, points, counts) {
     });
   }
 
-  function buildLongitudeLabelData(meridianValues) {
+  function buildLongitudeLabelData(meridianValues, labelLatitude) {
     return meridianValues
       .map(value => {
         const anchorCoordinates = {
           lon: value,
-          lat: definition.longitudeLabelLatitude
+          lat: labelLatitude
         };
         const anchorPoint = projectRotatedCoordinate(anchorCoordinates, geometry, state);
 
@@ -564,6 +570,7 @@ function renderSkyMap(mapName, points, counts) {
     const meridianValues = buildMeridianValues(angularStep);
     const parallelValues = buildParallelValues(angularStep);
     const secondaryParallelValues = parallelValues.filter(value => value !== 0);
+    const longitudeLabelLatitude = getLongitudeLabelLatitude(state.rotation.phi, angularStep);
     const meridianData = meridianValues.map(value => ({
       value,
       curve: buildCurve(value, "meridian")
@@ -592,7 +599,7 @@ function renderSkyMap(mapName, points, counts) {
       return `translate(${projected.x}, ${projected.y})`;
     });
 
-    const longitudeLabels = buildLongitudeLabelData(meridianValues);
+    const longitudeLabels = buildLongitudeLabelData(meridianValues, longitudeLabelLatitude);
     const latitudeLabels = buildLatitudeLabelData(parallelValues);
 
     longitudeLabelLayer.selectAll("text")
