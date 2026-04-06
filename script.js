@@ -15,7 +15,6 @@ const SKY_MAP_DEFINITIONS = {
     xLabel: "Galactic Longitude l",
     yLabel: "Galactic Latitude b",
     longitudeLabelLatitude: 0,
-    latitudeLabelLongitude: -150,
     tickLabel: value => `${value}°`,
     coordinates(row) {
       const lon = parseFloat(row["Gal_l (deg)"]);
@@ -33,7 +32,6 @@ const SKY_MAP_DEFINITIONS = {
     xLabel: "Right Ascension (J2000)",
     yLabel: "Declination",
     longitudeLabelLatitude: 0,
-    latitudeLabelLongitude: -150,
     tickLabel: formatRightAscensionLabel,
     coordinates(row) {
       const ra = parseRightAscension(row["R.A. (J2000)"]);
@@ -199,42 +197,6 @@ function formatLatitudeLabel(value) {
   return `${value}°`;
 }
 
-function normalizeVector(x, y) {
-  const length = Math.hypot(x, y) || 1;
-
-  return {
-    x: x / length,
-    y: y / length
-  };
-}
-
-function offsetLabelTowardInterior(anchorPoint, tangentPoint, geometry, distance) {
-  const tangent = normalizeVector(
-    tangentPoint.x - anchorPoint.x,
-    tangentPoint.y - anchorPoint.y
-  );
-  let normal = {
-    x: -tangent.y,
-    y: tangent.x
-  };
-  const toCenter = {
-    x: geometry.centerX - anchorPoint.x,
-    y: geometry.centerY - anchorPoint.y
-  };
-
-  if (normal.x * toCenter.x + normal.y * toCenter.y < 0) {
-    normal = {
-      x: -normal.x,
-      y: -normal.y
-    };
-  }
-
-  return {
-    x: anchorPoint.x + normal.x * distance,
-    y: anchorPoint.y + normal.y * distance
-  };
-}
-
 function hideTooltip(tooltip) {
   if (!tooltip) return;
 
@@ -369,7 +331,7 @@ function renderSkyMap(mapName, points, counts) {
     .attr("class", "sky-map-baseline");
 
   const longitudeLabelLayer = scene.append("g");
-  const latitudeLabelLayer = scene.append("g");
+  const latitudeLabelLayer = svg.append("g");
 
   const sources = scene.append("g")
     .selectAll(".sky-map-source")
@@ -566,22 +528,20 @@ function renderSkyMap(mapName, points, counts) {
   }
 
   function buildLatitudeLabelData(parallelValues) {
+    const labelX = geometry.centerX - geometry.radiusX - 10;
+
     return parallelValues.map(value => {
-      const anchorCoordinates = {
-        lon: definition.latitudeLabelLongitude,
-        lat: value
-      };
-      const anchorPoint = projectRotatedCoordinate(anchorCoordinates, geometry, state);
-      const tangentPoint = projectRotatedCoordinate({
-        lon: wrapLongitude(definition.latitudeLabelLongitude + 2),
-        lat: value
-      }, geometry, state);
-      const labelPoint = offsetLabelTowardInterior(anchorPoint, tangentPoint, geometry, 11);
+      const curve = buildCurve(value, "parallel");
+      const leftPoint = curve.reduce((best, point) => (
+        !best || point.x < best.x ? point : best
+      ), null);
+
+      if (!leftPoint) return null;
 
       return {
         value,
-        x: labelPoint.x,
-        y: labelPoint.y
+        x: labelX,
+        y: leftPoint.y
       };
     }).filter(Boolean);
   }
@@ -636,7 +596,7 @@ function renderSkyMap(mapName, points, counts) {
       .data(latitudeLabels, item => item.value)
       .join("text")
       .attr("class", "sky-map-grid-label")
-      .attr("text-anchor", "middle")
+      .attr("text-anchor", "end")
       .attr("dominant-baseline", "middle")
       .attr("x", item => item.x)
       .attr("y", item => item.y)
