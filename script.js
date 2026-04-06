@@ -15,7 +15,7 @@ const SKY_MAP_DEFINITIONS = {
     xLabel: "Galactic Longitude l",
     yLabel: "Galactic Latitude b",
     longitudeLabelLatitude: 0,
-    tickLabel: value => `${value}°`,
+    tickLabel: formatGalacticLongitudeLabel,
     coordinates(row) {
       const lon = parseFloat(row["Gal_l (deg)"]);
       const lat = parseFloat(row["Gal_b (deg)"]);
@@ -73,7 +73,7 @@ function getLongitudeLabelLatitude(rotationPhi, step) {
 }
 
 function buildMeridianValues(step) {
-  return d3.range(-180 + step, 180, step);
+  return d3.range(-180, 180, step);
 }
 
 function buildParallelValues(step) {
@@ -211,6 +211,14 @@ function formatRightAscensionLabel(value) {
   }
 
   return `${hours}h${String(minutes).padStart(2, "0")}m`;
+}
+
+function formatGalacticLongitudeLabel(value) {
+  if (value === -180) {
+    return "180°";
+  }
+
+  return `${value}°`;
 }
 
 function formatLatitudeLabel(value) {
