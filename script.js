@@ -10,14 +10,11 @@ const SKY_MAP_LAYOUT = {
   maxZoom: 10
 };
 
-const SKY_MERIDIANS = d3.range(-150, 151, 30);
-const SKY_PARALLELS = [-60, -30, 0, 30, 60];
-
 const SKY_MAP_DEFINITIONS = {
   galactic: {
     xLabel: "Galactic Longitude l",
     yLabel: "Galactic Latitude b",
-    longitudeLabelLatitude: -68,
+    longitudeLabelLatitude: 0,
     latitudeLabelLongitude: -150,
     tickLabel: value => `${value}°`,
     coordinates(row) {
@@ -35,9 +32,9 @@ const SKY_MAP_DEFINITIONS = {
   equatorial: {
     xLabel: "Right Ascension (J2000)",
     yLabel: "Declination",
-    longitudeLabelLatitude: -68,
+    longitudeLabelLatitude: 0,
     latitudeLabelLongitude: -150,
-    tickLabel: value => `${positiveModulo(-value, 360) / 15}h`,
+    tickLabel: formatRightAscensionLabel,
     coordinates(row) {
       const ra = parseRightAscension(row["R.A. (J2000)"]);
       const dec = parseDeclination(row["Dec. (J2000)"]);
@@ -62,6 +59,21 @@ function wrapLongitude(value) {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+function getAdaptiveAngularStep(zoom) {
+  if (zoom >= 7) return 5;
+  if (zoom >= 4) return 10;
+  if (zoom >= 2) return 15;
+  return 30;
+}
+
+function buildMeridianValues(step) {
+  return d3.range(-180 + step, 180, step);
+}
+
+function buildParallelValues(step) {
+  return d3.range(-90 + step, 90, step);
 }
 
 function stripMeasurement(value) {
@@ -169,6 +181,18 @@ function projectRotatedCoordinate(coordinates, geometry, state) {
     ...geometry,
     scale: geometry.scale * state.zoom
   });
+}
+
+function formatRightAscensionLabel(value) {
+  const totalMinutes = Math.round((positiveModulo(-value, 360) / 15) * 60);
+  const hours = Math.floor(totalMinutes / 60) % 24;
+  const minutes = totalMinutes % 60;
+
+  if (minutes === 0) {
+    return `${hours}h`;
+  }
+
+  return `${hours}h${String(minutes).padStart(2, "0")}m`;
 }
 
 function formatLatitudeLabel(value) {
@@ -338,21 +362,8 @@ function renderSkyMap(mapName, points, counts) {
 
   const scene = clippedViewport.append("g");
 
-  const meridianPaths = scene.append("g")
-    .selectAll(".sky-map-graticule-meridian")
-    .data(SKY_MERIDIANS)
-    .enter()
-    .append("path")
-    .attr("class", "sky-map-graticule");
-
-  const parallelValues = SKY_PARALLELS.filter(lat => lat !== 0);
-
-  const parallelPaths = scene.append("g")
-    .selectAll(".sky-map-graticule-parallel")
-    .data(parallelValues)
-    .enter()
-    .append("path")
-    .attr("class", "sky-map-graticule");
+  const meridianPathLayer = scene.append("g");
+  const parallelPathLayer = scene.append("g");
 
   const baselinePath = scene.append("path")
     .attr("class", "sky-map-baseline");
@@ -536,31 +547,26 @@ function renderSkyMap(mapName, points, counts) {
     });
   }
 
-  function buildLongitudeLabelData() {
-    return SKY_MERIDIANS
+  function buildLongitudeLabelData(meridianValues) {
+    return meridianValues
       .map(value => {
         const anchorCoordinates = {
           lon: value,
           lat: definition.longitudeLabelLatitude
         };
         const anchorPoint = projectRotatedCoordinate(anchorCoordinates, geometry, state);
-        const tangentPoint = projectRotatedCoordinate({
-          lon: value,
-          lat: clamp(definition.longitudeLabelLatitude + 2, -89, 89)
-        }, geometry, state);
-        const labelPoint = offsetLabelTowardInterior(anchorPoint, tangentPoint, geometry, 11);
 
         return {
           value,
-          x: labelPoint.x,
-          y: labelPoint.y
+          x: anchorPoint.x,
+          y: anchorPoint.y
         };
       })
       .filter(Boolean);
   }
 
-  function buildLatitudeLabelData() {
-    return SKY_PARALLELS.map(value => {
+  function buildLatitudeLabelData(parallelValues) {
+    return parallelValues.map(value => {
       const anchorCoordinates = {
         lon: definition.latitudeLabelLongitude,
         lat: value
@@ -581,23 +587,31 @@ function renderSkyMap(mapName, points, counts) {
   }
 
   function renderScene() {
-    const meridianData = SKY_MERIDIANS.map(value => ({
+    const angularStep = getAdaptiveAngularStep(state.zoom);
+    const meridianValues = buildMeridianValues(angularStep);
+    const parallelValues = buildParallelValues(angularStep);
+    const secondaryParallelValues = parallelValues.filter(value => value !== 0);
+    const meridianData = meridianValues.map(value => ({
       value,
       curve: buildCurve(value, "meridian")
     }));
-    const parallelData = parallelValues.map(value => ({
+    const parallelData = secondaryParallelValues.map(value => ({
       value,
       curve: buildCurve(value, "parallel")
     }));
 
-    meridianPaths.attr("d", item => {
-      const curve = meridianData.find(entry => entry.value === item).curve;
-      return buildSegmentedPath(curve, geometry, state.zoom, line);
-    });
-    parallelPaths.attr("d", item => {
-      const curve = parallelData.find(entry => entry.value === item).curve;
-      return buildSegmentedPath(curve, geometry, state.zoom, line);
-    });
+    meridianPathLayer.selectAll("path")
+      .data(meridianData, item => item.value)
+      .join("path")
+      .attr("class", "sky-map-graticule")
+      .attr("d", item => buildSegmentedPath(item.curve, geometry, state.zoom, line));
+
+    parallelPathLayer.selectAll("path")
+      .data(parallelData, item => item.value)
+      .join("path")
+      .attr("class", "sky-map-graticule")
+      .attr("d", item => buildSegmentedPath(item.curve, geometry, state.zoom, line));
+
     baselinePath.attr("d", buildSegmentedPath(buildCurve(0, "parallel"), geometry, state.zoom, line));
 
     sources.attr("transform", point => {
@@ -605,8 +619,8 @@ function renderSkyMap(mapName, points, counts) {
       return `translate(${projected.x}, ${projected.y})`;
     });
 
-    const longitudeLabels = buildLongitudeLabelData();
-    const latitudeLabels = buildLatitudeLabelData();
+    const longitudeLabels = buildLongitudeLabelData(meridianValues);
+    const latitudeLabels = buildLatitudeLabelData(parallelValues);
 
     longitudeLabelLayer.selectAll("text")
       .data(longitudeLabels, item => item.value)
