@@ -1,3 +1,149 @@
+// Normalized hotspot positions for the current exported sky-map PNGs.
+const SKY_MAP_POINTS = {
+  galactic: [
+    { id: "LPT J1745-3009", x: 0.505959, y: 0.524319 },
+    { id: "LPT J1627-5235", x: 0.441536, y: 0.535588 },
+    { id: "LPT J1839-1031", x: 0.562684, y: 0.532646 },
+    { id: "LPT J1935+2148", x: 0.648172, y: 0.517281 },
+    { id: "LPT J1755-2527", x: 0.518706, y: 0.522214 },
+    { id: "LPT J0636+2526", x: 0.090847, y: 0.482742 },
+    { id: "LPT J1101+5521", x: 0.765709, y: 0.236412 },
+    { id: "LPT J0704-3706", x: 0.240002, y: 0.595628 },
+    { id: "LPT J1832-0911", x: 0.56371, y: 0.520927 },
+    { id: "LPT J1839-0756", x: 0.568533, y: 0.527142 },
+    { id: "LPT J1634+4450", x: 0.6502, y: 0.296833 },
+    { id: "LPT J1448-6856", x: 0.395172, y: 0.567391 },
+    { id: "LPT J1424-6126", x: 0.396015, y: 0.524359 }
+  ],
+  equatorial: [
+    { id: "LPT J1745-3009", x: 0.731172, y: 0.686857 },
+    { id: "LPT J1627-5235", x: 0.723978, y: 0.798835 },
+    { id: "LPT J1839-1031", x: 0.715619, y: 0.579952 },
+    { id: "LPT J1935+2148", x: 0.675393, y: 0.400642 },
+    { id: "LPT J1755-2527", x: 0.730851, y: 0.661805 },
+    { id: "LPT J0636+2526", x: 0.28949, y: 0.381045 },
+    { id: "LPT J1101+5521", x: 0.228492, y: 0.231194 },
+    { id: "LPT J0704-3706", x: 0.288309, y: 0.722983 },
+    { id: "LPT J1832-0911", x: 0.720371, y: 0.572529 },
+    { id: "LPT J1839-0756", x: 0.716011, y: 0.565638 },
+    { id: "LPT J1634+4450", x: 0.741853, y: 0.280995 },
+    { id: "LPT J1448-6856", x: 0.697632, y: 0.868562 },
+    { id: "LPT J1424-6126", x: 0.743203, y: 0.838206 }
+  ]
+};
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function hideSkyOverlayState(overlay) {
+  const tooltip = overlay.querySelector(".sky-tooltip");
+  const marker = overlay.querySelector(".sky-active-marker");
+
+  tooltip.hidden = true;
+  tooltip.classList.remove("below");
+  marker.hidden = true;
+  marker.classList.remove("square");
+  overlay.style.cursor = "default";
+}
+
+function showSkyOverlayState(overlay, point, xPx, yPx) {
+  const tooltip = overlay.querySelector(".sky-tooltip");
+  const marker = overlay.querySelector(".sky-active-marker");
+  const bounds = overlay.getBoundingClientRect();
+  const padding = 12;
+
+  marker.hidden = false;
+  marker.classList.toggle("square", point.isBinary);
+  marker.style.left = `${point.x * 100}%`;
+  marker.style.top = `${point.y * 100}%`;
+
+  tooltip.textContent = point.name;
+  tooltip.hidden = false;
+
+  const tooltipHalfWidth = tooltip.offsetWidth / 2;
+  const left = clamp(
+    xPx,
+    tooltipHalfWidth + padding,
+    bounds.width - tooltipHalfWidth - padding
+  );
+  const placeBelow = yPx < tooltip.offsetHeight + 20;
+
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${placeBelow ? yPx + 10 : yPx - 10}px`;
+  tooltip.classList.toggle("below", placeBelow);
+
+  overlay.style.cursor = "pointer";
+}
+
+function bindSkyOverlay(overlay, points) {
+  if (!overlay || points.length === 0) return;
+
+  function findNearestPoint(clientX, clientY) {
+    const bounds = overlay.getBoundingClientRect();
+    const xPx = clientX - bounds.left;
+    const yPx = clientY - bounds.top;
+    const threshold = window.matchMedia("(pointer: coarse)").matches ? 18 : 12;
+
+    let nearest = null;
+
+    points.forEach(point => {
+      const pointXPx = point.x * bounds.width;
+      const pointYPx = point.y * bounds.height;
+      const distance = Math.hypot(pointXPx - xPx, pointYPx - yPx);
+
+      if (!nearest || distance < nearest.distance) {
+        nearest = { point, distance, xPx: pointXPx, yPx: pointYPx };
+      }
+    });
+
+    if (!nearest || nearest.distance > threshold) {
+      hideSkyOverlayState(overlay);
+      return;
+    }
+
+    showSkyOverlayState(overlay, nearest.point, nearest.xPx, nearest.yPx);
+  }
+
+  overlay.addEventListener("mousemove", event => {
+    findNearestPoint(event.clientX, event.clientY);
+  });
+
+  overlay.addEventListener("click", event => {
+    findNearestPoint(event.clientX, event.clientY);
+  });
+
+  overlay.addEventListener("mouseleave", () => {
+    hideSkyOverlayState(overlay);
+  });
+}
+
+function initializeSkyMaps(rows) {
+  const rowsById = new Map(rows.map(row => [row.ID, row]));
+
+  Object.entries(SKY_MAP_POINTS).forEach(([mapName, points]) => {
+    const overlay = document.querySelector(`.sky-overlay[data-overlay="${mapName}"]`);
+
+    if (!overlay) return;
+
+    const resolvedPoints = points
+      .map(point => {
+        const row = rowsById.get(point.id);
+
+        if (!row) return null;
+
+        return {
+          ...point,
+          name: row.Name,
+          isBinary: /binary/i.test(row.Notes || "")
+        };
+      })
+      .filter(Boolean);
+
+    bindSkyOverlay(overlay, resolvedPoints);
+  });
+}
+
 d3.csv("LPTs.csv").then(data => {
 
   // Columns to hide completely
@@ -287,6 +433,7 @@ function formatReference(ref) {
   
   // ---- Initial render ----
   renderTable(currentData);
+  initializeSkyMaps(data);
 
 });
 
@@ -313,11 +460,15 @@ document.querySelectorAll(".toggle-btn").forEach(btn => {
     const target = btn.dataset.target;
 
     // Toggle figures
-    document.querySelectorAll(".sky-figure").forEach(img => {
-      img.classList.toggle(
+    document.querySelectorAll(".sky-panel").forEach(panel => {
+      panel.classList.toggle(
         "hidden",
-        img.dataset.figure !== target
+        panel.dataset.figure !== target
       );
+    });
+
+    document.querySelectorAll(".sky-overlay").forEach(overlay => {
+      hideSkyOverlayState(overlay);
     });
   });
 });

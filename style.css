@@ -198,10 +198,60 @@ td.ref-cell a {
   margin: 0 auto;
 }
 
-.sky-figure {
+.sky-panel {
+  position: relative;
+  width: 85%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.sky-panel .sky-figure {
   width: 100%;
+  max-width: none;
+  display: block;
   border-radius: 8px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.sky-overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.sky-active-marker {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(44, 107, 237, 0.95);
+  background: rgba(44, 107, 237, 0.16);
+  box-shadow: 0 0 0 5px rgba(44, 107, 237, 0.16);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.sky-active-marker.square {
+  border-radius: 4px;
+}
+
+.sky-tooltip {
+  position: absolute;
+  z-index: 2;
+  max-width: min(260px, calc(100% - 24px));
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(23, 28, 37, 0.92);
+  color: #fff;
+  font-size: 0.82rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 12px));
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+}
+
+.sky-tooltip.below {
+  transform: translate(-50%, 12px);
 }
 
 .hidden {
@@ -317,6 +367,16 @@ caption {
     line-height: 1.5;
   }
 
+  .catalog-figure img,
+  .sky-panel {
+    width: 100%;
+  }
+
+  .sky-tooltip {
+    font-size: 0.75rem;
+    max-width: calc(100% - 16px);
+  }
+
   table {
     font-size: 0.85rem;
   }
@@ -327,4 +387,3 @@ caption {
 }
   
 }
-
