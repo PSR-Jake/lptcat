@@ -1,0 +1,368 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - img "LPT-Cat logo" [ref=e4]
+      - generic [ref=e5]:
+        - heading "Long-Period Radio Transient Catalog" [level=1] [ref=e6]
+        - heading "LPT-Cat" [level=2] [ref=e7]
+  - generic [ref=e8]:
+    - heading "About LPT-Cat" [level=2] [ref=e9]
+    - paragraph [ref=e10]:
+      - text: LPT-Cat is a curated catalog of
+      - strong [ref=e11]: long-period radio transients (LPTs)
+      - text: ", a mysterious population of radio sources characterized by minute- to hour-long periodicities. This catalog compiles published LPTs from the literature, including their positions, periods, spin-down constraints, dispersion measures (DM), rotation measures (RM), and key observational notes."
+    - paragraph [ref=e12]:
+      - text: You can download the catalog in
+      - link "CSV version" [ref=e13] [cursor=pointer]:
+        - /url: LPTs.csv
+      - text: .
+    - paragraph [ref=e14]: If you find any errors or missing information, please let me know via email (zhao27[AT]tsinghua.edu.cn). If you use LPT information from this catalog in your research, please cite the relevant discovery papers listed in the References column. Acknowledging the use of this website in your research paper would be appreciated. Thanks!
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - button "Galactic (ℓ, b)" [ref=e17] [cursor=pointer]
+      - button "Equatorial (RA, Dec)" [active] [ref=e18] [cursor=pointer]
+    - generic [ref=e319]:
+      - generic [ref=e320]:
+        - generic [ref=e321]: Drag to pan. Scroll or pinch to zoom.
+        - generic [ref=e322]:
+          - generic [ref=e323]: 1.0x
+          - button "Reset view" [ref=e324] [cursor=pointer]
+      - img "Interactive sky distribution of LPTs in equatorial coordinates" [ref=e326]:
+        - generic [ref=e340]:
+          - button "GCRT J1745-3009"
+          - button "GLEAM-X J162759.5-523504.3"
+          - button "GPM J1839-10"
+          - button "ASKAP J1935+2148"
+          - button "ASKAP J1755-2527"
+          - button "CHIME J0630+25"
+          - button "ILT J1101+5521"
+          - button "GLEAM-X J0704−37"
+          - button "ASKAP/DART J1832-0911"
+          - button "ASKAP J183950.5-075635.0"
+          - button "CHIME/ILT J1634+44"
+          - button "ASKAP J144834-685644"
+          - button "ASKAP J142431.2-612611"
+        - generic [ref=e342]: N_LPT = 13
+        - generic [ref=e343]: 3 WD-M dwarf binaries | 10 unknown progenitors
+        - generic [ref=e344]: 10h
+        - generic [ref=e345]: 8h
+        - generic [ref=e346]: 6h
+        - generic [ref=e347]: 4h
+        - generic [ref=e348]: 2h
+        - generic [ref=e349]: 0h
+        - generic [ref=e350]: 22h
+        - generic [ref=e351]: 20h
+        - generic [ref=e352]: 18h
+        - generic [ref=e353]: 16h
+        - generic [ref=e354]: 14h
+        - generic [ref=e355]: Right Ascension (J2000)
+        - generic [ref=e356]: Declination
+        - generic [ref=e357]:
+          - generic [ref=e359]: Unknown
+          - generic [ref=e361]: WD-M dwarf
+    - generic [ref=e63]: Sky distribution of known long-period transients (LPTs). Squares show LPTs that are (likely) white dwarf (WD)–M dwarf binary systems, while dots represent LPTs with unknown nature. The distribution is shown in Galactic (ℓ, b) and Equatorial (RA, Dec). Hover over a source marker to see the corresponding LPT name, and zoom in to inspect crowded regions.
+  - textbox "Search..." [ref=e64]
+  - table "Uncertainties and upper limits are quoted at the 1σ level when available." [ref=e66]:
+    - rowgroup [ref=e67]:
+      - row "Name ▲ ID ▲ R.A. (J2000) ▲ Dec. (J2000) ▲ l (deg) ▲ b (deg) ▲ Period (min) ▲ Ṗ (s s⁻¹) DM (pc cm⁻³) ▲ RM (rad m⁻²) ▲ Duty cycle Notes References" [ref=e68]:
+        - columnheader "Name ▲" [ref=e69] [cursor=pointer]
+        - columnheader "ID ▲" [ref=e70] [cursor=pointer]
+        - columnheader "R.A. (J2000) ▲" [ref=e71] [cursor=pointer]
+        - columnheader "Dec. (J2000) ▲" [ref=e72] [cursor=pointer]
+        - columnheader "l (deg) ▲" [ref=e73] [cursor=pointer]
+        - columnheader "b (deg) ▲" [ref=e74] [cursor=pointer]
+        - columnheader "Period (min) ▲" [ref=e75] [cursor=pointer]
+        - columnheader "Ṗ (s s⁻¹)" [ref=e76]
+        - columnheader "DM (pc cm⁻³) ▲" [ref=e77] [cursor=pointer]
+        - columnheader "RM (rad m⁻²) ▲" [ref=e78] [cursor=pointer]
+        - columnheader "Duty cycle" [ref=e79]
+        - columnheader "Notes" [ref=e80]
+        - columnheader "References" [ref=e81]
+    - rowgroup [ref=e82]:
+      - row "GCRT J1745-3009 LPT J1745-3009 17:45:05(1) -30:09:52(10) 358.891(3) -0.541(3) 76.2 - - - ~0.13 First discovered LPT-like source hlk+05" [ref=e83]:
+        - cell "GCRT J1745-3009" [ref=e84]
+        - cell "LPT J1745-3009" [ref=e85]
+        - cell "17:45:05(1)" [ref=e86]
+        - cell "-30:09:52(10)" [ref=e87]
+        - cell "358.891(3)" [ref=e88]
+        - cell "-0.541(3)" [ref=e89]
+        - cell "76.2" [ref=e90]
+        - cell "-" [ref=e91]
+        - cell "-" [ref=e92]
+        - cell "-" [ref=e93]
+        - cell "~0.13" [ref=e94]
+        - cell "First discovered LPT-like source" [ref=e95]
+        - cell "hlk+05" [ref=e96]:
+          - link "hlk+05" [ref=e97] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/astro-ph/0503052
+      - row "GLEAM-X J162759.5-523504.3 LPT J1627-5235 16:27:59.5(1) -52:35:04(2) 332.465(1) -2.601(1) 18.2 <1.2×10-9 57 ± 1 -61 ± 1 0.03-0.06 First modern LPT hzb+22, rzd+22" [ref=e98]:
+        - cell "GLEAM-X J162759.5-523504.3" [ref=e99]
+        - cell "LPT J1627-5235" [ref=e100]
+        - cell "16:27:59.5(1)" [ref=e101]
+        - cell "-52:35:04(2)" [ref=e102]
+        - cell "332.465(1)" [ref=e103]
+        - cell "-2.601(1)" [ref=e104]
+        - cell "18.2" [ref=e105]
+        - cell "<1.2×10-9" [ref=e106]:
+          - text: <1.2×10
+          - superscript [ref=e107]: "-9"
+        - cell "57 ± 1" [ref=e108]
+        - cell "-61 ± 1" [ref=e109]
+        - cell "0.03-0.06" [ref=e110]
+        - cell "First modern LPT" [ref=e111]
+        - cell "hzb+22, rzd+22" [ref=e112]:
+          - link "hzb+22" [ref=e113] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2503.08033
+          - text: ","
+          - link "rzd+22" [ref=e114] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2210.01903
+      - row "GPM J1839-10 LPT J1839-1031 18:39:02.00(1) -10:31:49.37(15) 22.15268(4) -2.06297(4) 22.0 <3.6×10-13 273.5 ± 2.5 -531.83 ± 0.14 0.02-0.2 Active for three decades hrm+23" [ref=e115]:
+        - cell "GPM J1839-10" [ref=e116]
+        - cell "LPT J1839-1031" [ref=e117]
+        - cell "18:39:02.00(1)" [ref=e118]
+        - cell "-10:31:49.37(15)" [ref=e119]
+        - cell "22.15268(4)" [ref=e120]
+        - cell "-2.06297(4)" [ref=e121]
+        - cell "22.0" [ref=e122]
+        - cell "<3.6×10-13" [ref=e123]:
+          - text: <3.6×10
+          - superscript [ref=e124]: "-13"
+        - cell "273.5 ± 2.5" [ref=e125]
+        - cell "-531.83 ± 0.14" [ref=e126]
+        - cell "0.02-0.2" [ref=e127]
+        - cell "Active for three decades" [ref=e128]
+        - cell "hrm+23" [ref=e129]:
+          - link "hrm+23" [ref=e130] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2503.08036
+      - row "ASKAP J1935+2148 LPT J1935+2148 19:35:05.18(2) 21:48:41.5(6) 57.1904(1) 0.7453(2) 53.8 <1.2×10-10 145.8 ± 3.5 159.1 ± 0.3 0.0001-0.015 Three emission states clk+24" [ref=e131]:
+        - cell "ASKAP J1935+2148" [ref=e132]
+        - cell "LPT J1935+2148" [ref=e133]
+        - cell "19:35:05.18(2)" [ref=e134]
+        - cell "21:48:41.5(6)" [ref=e135]
+        - cell "57.1904(1)" [ref=e136]
+        - cell "0.7453(2)" [ref=e137]
+        - cell "53.8" [ref=e138]
+        - cell "<1.2×10-10" [ref=e139]:
+          - text: <1.2×10
+          - superscript [ref=e140]: "-10"
+        - cell "145.8 ± 3.5" [ref=e141]
+        - cell "159.1 ± 0.3" [ref=e142]
+        - cell "0.0001-0.015" [ref=e143]
+        - cell "Three emission states" [ref=e144]
+        - cell "clk+24" [ref=e145]:
+          - link "clk+24" [ref=e146] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2407.12266
+      - row "ASKAP J1755-2527 LPT J1755-2527 17:55:34.87(2) -25:27:49.9(4) 4.1164(1) -0.1227(1) 69.8 <8.2×10-11 733 ± 22 962 ± 2 0.01-0.04 Significantly scattered and intermittent dzo+24, mhh+25" [ref=e147]:
+        - cell "ASKAP J1755-2527" [ref=e148]
+        - cell "LPT J1755-2527" [ref=e149]
+        - cell "17:55:34.87(2)" [ref=e150]
+        - cell "-25:27:49.9(4)" [ref=e151]
+        - cell "4.1164(1)" [ref=e152]
+        - cell "-0.1227(1)" [ref=e153]
+        - cell "69.8" [ref=e154]
+        - cell "<8.2×10-11" [ref=e155]:
+          - text: <8.2×10
+          - superscript [ref=e156]: "-11"
+        - cell "733 ± 22" [ref=e157]
+        - cell "962 ± 2" [ref=e158]
+        - cell "0.01-0.04" [ref=e159]
+        - cell "Significantly scattered and intermittent" [ref=e160]
+        - cell "dzo+24, mhh+25" [ref=e161]:
+          - link "dzo+24" [ref=e162] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2406.12352
+          - text: ","
+          - link "mhh+25" [ref=e163] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2507.14448
+      - row "CHIME J0630+25 LPT J0636+2526 06:30:38(4) 25:26:23(60) 187.92(2) 7.07(2) 7.0 5.2(1.1)×10-12 22 ± 1 -347.8 ± 0.6 0.03-0.05 Found with a timing glitch dcc+24" [ref=e164]:
+        - cell "CHIME J0630+25" [ref=e165]
+        - cell "LPT J0636+2526" [ref=e166]
+        - cell "06:30:38(4)" [ref=e167]
+        - cell "25:26:23(60)" [ref=e168]
+        - cell "187.92(2)" [ref=e169]
+        - cell "7.07(2)" [ref=e170]
+        - cell "7.0" [ref=e171]
+        - cell "5.2(1.1)×10-12" [ref=e172]:
+          - text: 5.2(1.1)×10
+          - superscript [ref=e173]: "-12"
+        - cell "22 ± 1" [ref=e174]
+        - cell "-347.8 ± 0.6" [ref=e175]
+        - cell "0.03-0.05" [ref=e176]
+        - cell "Found with a timing glitch" [ref=e177]
+        - cell "dcc+24" [ref=e178]:
+          - link "dcc+24" [ref=e179] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2407.07480
+      - row "ILT J1101+5521 LPT J1101+5521 11:01:50.5(1) 55:21:19.61(39) 150.4551(5) 55.5200(1) 125.5 <5.7×10-12 16 ± 6 4.72 ± 0.14 0.004-0.012 White dwarf-M dwarf binary rrb+24" [ref=e180]:
+        - cell "ILT J1101+5521" [ref=e181]
+        - cell "LPT J1101+5521" [ref=e182]
+        - cell "11:01:50.5(1)" [ref=e183]
+        - cell "55:21:19.61(39)" [ref=e184]
+        - cell "150.4551(5)" [ref=e185]
+        - cell "55.5200(1)" [ref=e186]
+        - cell "125.5" [ref=e187]
+        - cell "<5.7×10-12" [ref=e188]:
+          - text: <5.7×10
+          - superscript [ref=e189]: "-12"
+        - cell "16 ± 6" [ref=e190]
+        - cell "4.72 ± 0.14" [ref=e191]
+        - cell "0.004-0.012" [ref=e192]
+        - cell "White dwarf-M dwarf binary" [ref=e193]
+        - cell "rrb+24" [ref=e194]:
+          - link "rrb+24" [ref=e195] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2408.11536
+      - row "GLEAM-X J0704−37 LPT J0704-3706 07:04:13.19(2) -37:06:14.3(3) 247.9122(1) -13.6218(1) 174.9 <1.3×10-11 36.541 ± 0.005 -7 ± 1 0.003-0.006 White dwarf-M dwarf binary hmb+24, r+25" [ref=e196]:
+        - cell "GLEAM-X J0704−37" [ref=e197]
+        - cell "LPT J0704-3706" [ref=e198]
+        - cell "07:04:13.19(2)" [ref=e199]
+        - cell "-37:06:14.3(3)" [ref=e200]
+        - cell "247.9122(1)" [ref=e201]
+        - cell "-13.6218(1)" [ref=e202]
+        - cell "174.9" [ref=e203]
+        - cell "<1.3×10-11" [ref=e204]:
+          - text: <1.3×10
+          - superscript [ref=e205]: "-11"
+        - cell "36.541 ± 0.005" [ref=e206]
+        - cell "-7 ± 1" [ref=e207]
+        - cell "0.003-0.006" [ref=e208]
+        - cell "White dwarf-M dwarf binary" [ref=e209]
+        - cell "hmb+24, r+25" [ref=e210]:
+          - link "hmb+24" [ref=e211] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2408.15757
+          - text: ","
+          - link "r+25" [ref=e212] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2501.03315
+      - row "ASKAP/DART J1832-0911 LPT J1832-0911 18:32:08.45889(33) -09:11:15.297(5) 22.564604(1) 0.061966(1) 44.3 <9.8×10-10 458 ± 14 90.5 ± 0.1 0.05-0.1 Transient X-ray counterpart wrb+24, lyw+24" [ref=e213]:
+        - cell "ASKAP/DART J1832-0911" [ref=e214]
+        - cell "LPT J1832-0911" [ref=e215]
+        - cell "18:32:08.45889(33)" [ref=e216]
+        - cell "-09:11:15.297(5)" [ref=e217]
+        - cell "22.564604(1)" [ref=e218]
+        - cell "0.061966(1)" [ref=e219]
+        - cell "44.3" [ref=e220]
+        - cell "<9.8×10-10" [ref=e221]:
+          - text: <9.8×10
+          - superscript [ref=e222]: "-10"
+        - cell "458 ± 14" [ref=e223]
+        - cell "90.5 ± 0.1" [ref=e224]
+        - cell "0.05-0.1" [ref=e225]
+        - cell "Transient X-ray counterpart" [ref=e226]
+        - cell "wrb+24, lyw+24" [ref=e227]:
+          - link "wrb+24" [ref=e228] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2411.16606
+          - text: ","
+          - link "lyw+24" [ref=e229] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2411.15739
+      - row "ASKAP J183950.5-075635.0 LPT J1839-0756 18:39:50.57(2) -07:56:39.17(15) 24.54440(9) -1.05687(4) 387.0 <5.3×10-8 188.4 ± 1.7 214 ± 1 0.014-0.031 Slowest LPT lcm+25" [ref=e230]:
+        - cell "ASKAP J183950.5-075635.0" [ref=e231]
+        - cell "LPT J1839-0756" [ref=e232]
+        - cell "18:39:50.57(2)" [ref=e233]
+        - cell "-07:56:39.17(15)" [ref=e234]
+        - cell "24.54440(9)" [ref=e235]
+        - cell "-1.05687(4)" [ref=e236]
+        - cell "387.0" [ref=e237]
+        - cell "<5.3×10-8" [ref=e238]:
+          - text: <5.3×10
+          - superscript [ref=e239]: "-8"
+        - cell "188.4 ± 1.7" [ref=e240]
+        - cell "214 ± 1" [ref=e241]
+        - cell "0.014-0.031" [ref=e242]
+        - cell "Slowest LPT" [ref=e243]
+        - cell "lcm+25" [ref=e244]:
+          - link "lcm+25" [ref=e245] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2501.09133
+      - row "CHIME/ILT J1634+44 LPT J1634+4450 16:34:29.96(3) 44:50:13.5(1.1) 70.1707(1) 42.5754(3) 14.0 -9.0(0.1)×10-12 22.5 ± 5.5 6.27 ± 0.04 <0.012 Significant spin-up rate; likely white dwarf binary system bvb+25, dsl+25" [ref=e246]:
+        - cell "CHIME/ILT J1634+44" [ref=e247]
+        - cell "LPT J1634+4450" [ref=e248]
+        - cell "16:34:29.96(3)" [ref=e249]
+        - cell "44:50:13.5(1.1)" [ref=e250]
+        - cell "70.1707(1)" [ref=e251]
+        - cell "42.5754(3)" [ref=e252]
+        - cell "14.0" [ref=e253]
+        - cell "-9.0(0.1)×10-12" [ref=e254]:
+          - text: "-9.0(0.1)×10"
+          - superscript [ref=e255]: "-12"
+        - cell "22.5 ± 5.5" [ref=e256]
+        - cell "6.27 ± 0.04" [ref=e257]
+        - cell "<0.012" [ref=e258]
+        - cell "Significant spin-up rate; likely white dwarf binary system" [ref=e259]
+        - cell "bvb+25, dsl+25" [ref=e260]:
+          - link "bvb+25" [ref=e261] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2507.05078
+          - text: ","
+          - link "dsl+25" [ref=e262] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2507.05139
+      - row "ASKAP J144834-685644 LPT J1448-6856 14:48:34.29(2) -68:56:44.1(3) 313.1644(1) -8.4339(1) 93.9 <4.4×10-9 - - 0.15-0.7 Found with optical and X-ray counterparts akr+25" [ref=e263]:
+        - cell "ASKAP J144834-685644" [ref=e264]
+        - cell "LPT J1448-6856" [ref=e265]
+        - cell "14:48:34.29(2)" [ref=e266]
+        - cell "-68:56:44.1(3)" [ref=e267]
+        - cell "313.1644(1)" [ref=e268]
+        - cell "-8.4339(1)" [ref=e269]
+        - cell "93.9" [ref=e270]
+        - cell "<4.4×10-9" [ref=e271]:
+          - text: <4.4×10
+          - superscript [ref=e272]: "-9"
+        - cell "-" [ref=e273]
+        - cell "-" [ref=e274]
+        - cell "0.15-0.7" [ref=e275]
+        - cell "Found with optical and X-ray counterparts" [ref=e276]
+        - cell "akr+25" [ref=e277]:
+          - link "akr+25" [ref=e278] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2507.13453
+      - row "ASKAP J142431.2-612611 LPT J1424-6126 14:24:31.40(6) -61:26:10.8(2) 313.8213(1) -0.5483(1) 35.8 <1.0×10-8 1400 ± 100 -222 - No counterpart found pmd+26" [ref=e279]:
+        - cell "ASKAP J142431.2-612611" [ref=e280]
+        - cell "LPT J1424-6126" [ref=e281]
+        - cell "14:24:31.40(6)" [ref=e282]
+        - cell "-61:26:10.8(2)" [ref=e283]
+        - cell "313.8213(1)" [ref=e284]
+        - cell "-0.5483(1)" [ref=e285]
+        - cell "35.8" [ref=e286]
+        - cell "<1.0×10-8" [ref=e287]:
+          - text: <1.0×10
+          - superscript [ref=e288]: "-8"
+        - cell "1400 ± 100" [ref=e289]
+        - cell "-222" [ref=e290]
+        - cell "-" [ref=e291]
+        - cell "No counterpart found" [ref=e292]
+        - cell "pmd+26" [ref=e293]:
+          - link "pmd+26" [ref=e294] [cursor=pointer]:
+            - /url: https://arxiv.org/abs/2603.07857
+    - caption [ref=e295]: Uncertainties and upper limits are quoted at the 1σ level when available.
+  - figure "P–Ṗ diagram including available LPTs. Black dots show radio pulsars from the ATNF pulsar catalog, with anomalous X-ray pulsars (AXPs) and soft gamma-ray repeaters (SGRs) highlighted. The shaded region (adapted from hrm+25) represents the \"death valley\", below which coherent radio emission is not expected. CHIME/ILT J1634+44 is not shown in this diagram due to its negative period derivative." [ref=e296]:
+    - img "P-Pdot diagram including LPTs" [ref=e297]
+    - generic [ref=e298]:
+      - text: P–Ṗ diagram including available LPTs. Black dots show radio pulsars from the
+      - link "ATNF pulsar catalog" [ref=e299] [cursor=pointer]:
+        - /url: https://www.atnf.csiro.au/research/pulsar/psrcat/
+      - text: ", with anomalous X-ray pulsars (AXPs) and soft gamma-ray repeaters (SGRs) highlighted. The shaded region (adapted from"
+      - link "hrm+25" [ref=e300] [cursor=pointer]:
+        - /url: https://arxiv.org/abs/2503.08036
+      - text: ) represents the "death valley", below which coherent radio emission is not expected. CHIME/ILT J1634+44 is not shown in this diagram due to its negative period derivative.
+  - separator [ref=e301]
+  - generic [ref=e302]:
+    - heading "Updates" [level=3] [ref=e303]
+    - list [ref=e304]:
+      - listitem [ref=e305]:
+        - strong [ref=e306]: 2026-03-11
+        - text: ": Added the discovery of a"
+        - link "36-min LPT found by ASKAP" [ref=e307] [cursor=pointer]:
+          - /url: https://arxiv.org/abs/2603.07857
+      - listitem [ref=e308]:
+        - strong [ref=e309]: 2025-12-24
+        - text: ": Initial release of the LPT-Cat"
+      - listitem [ref=e310]:
+        - strong [ref=e311]: 2025-08-21
+        - text: ": Thinking of building the LPT-Cat and website."
+    - paragraph [ref=e312]:
+      - link "(Full update history)" [ref=e313] [cursor=pointer]:
+        - /url: updates.csv
+  - contentinfo [ref=e314]:
+    - paragraph [ref=e315]:
+      - text: Maintained by
+      - link "Jiaqi (Jake) Zhao" [ref=e316] [cursor=pointer]:
+        - /url: https://psr-jake.github.io/index.html
+      - text: .
+    - paragraph [ref=e317]:
+      - text: See the
+      - link "source code" [ref=e318] [cursor=pointer]:
+        - /url: https://github.com/psr-jake/lptcat
+      - text: on Github.
