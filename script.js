@@ -1089,10 +1089,14 @@ function formatReference(ref) {
 
 d3.csv("updates.csv").then(updates => {
   const list = d3.select("#update-list");
+  const maxVisibleUpdates = 5;
+  const latestUpdates = updates
+    .slice()
+    // Dates are stored as YYYY-MM-DD, so string sorting matches chronology.
+    .sort((a, b) => b.Date.localeCompare(a.Date))
+    .slice(0, maxVisibleUpdates);
 
-  updates
-    .slice(-5)
-    // .reverse()
+  latestUpdates
     .forEach(u => {
       list.append("li")
         .html(`<strong>${u.Date}</strong>: ${u.Description}`);
