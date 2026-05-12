@@ -754,6 +754,50 @@ d3.csv("LPTs.csv").then(data => {
   { key: "References", label: "References", sortable: false }
 ];
 
+  const sortTypes = {
+    Name: "text",
+    ID: "text",
+    "R.A. (J2000)": "number",
+    "Dec. (J2000)": "number",
+    "Gal_l (deg)": "number",
+    "Gal_b (deg)": "number",
+    "Period (min)": "number",
+    DM: "number",
+    RM: "number"
+  };
+
+  const sortCollator = new Intl.Collator(undefined, {
+    numeric: true,
+    sensitivity: "base"
+  });
+  const defaultSortSymbol = '<span class="sort-arrow">▲</span><span class="sort-arrow">▼</span>';
+  const ascendingSortSymbol = '<span class="sort-arrow">▲</span><span class="sort-arrow sort-arrow-muted">▼</span>';
+  const descendingSortSymbol = '<span class="sort-arrow sort-arrow-muted">▲</span><span class="sort-arrow">▼</span>';
+
+  function isMissingCatalogValue(value) {
+    return value == null || String(value).trim() === "" || String(value).trim() === "-";
+  }
+
+  function toSortableNumber(value) {
+    if (isMissingCatalogValue(value)) return null;
+
+    const number = Number.parseFloat(String(value).replace(/−/g, "-"));
+    return Number.isFinite(number) ? number : null;
+  }
+
+  function toSortableCoordinate(value, parser) {
+    if (isMissingCatalogValue(value)) return null;
+
+    const coordinate = parser(value);
+    return Number.isFinite(coordinate) ? coordinate : null;
+  }
+
+  function toSortableText(value) {
+    if (isMissingCatalogValue(value)) return null;
+
+    return String(value).trim();
+  }
+
 // function toSuperscript(n) {
 //   const map = { "-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹" };
 //   return String(n).split("").map(c => map[c] ?? c).join("");
@@ -789,7 +833,7 @@ function formatReference(ref) {
 }
   
   // Process rows
-  const processed = data.map(d => {
+  const processed = data.map((d, index) => {
 
     // ---- Gal_l with error ----
     let gal_l = "-";
@@ -889,6 +933,18 @@ function formatReference(ref) {
       rm = rmVal;
     }
 
+    const sortValues = {
+      Name: toSortableText(d.Name),
+      ID: toSortableText(d.ID),
+      "R.A. (J2000)": toSortableCoordinate(d["R.A. (J2000)"], parseRightAscension),
+      "Dec. (J2000)": toSortableCoordinate(d["Dec. (J2000)"], parseDeclination),
+      "Gal_l (deg)": toSortableNumber(l_val),
+      "Gal_b (deg)": toSortableNumber(b_val),
+      "Period (min)": toSortableNumber(d["Period (min)"]),
+      DM: toSortableNumber(dmVal),
+      RM: toSortableNumber(rmVal)
+    };
+
     return {
       ...d,
       ["Gal_l (deg)"]: gal_l,
@@ -896,7 +952,9 @@ function formatReference(ref) {
       Pdot: pdot,
       DM: dm,
       RM: rm,
-      References: formatReference(d["References"])
+      References: formatReference(d["References"]),
+      __sortValues: sortValues,
+      __originalIndex: index
     };
   });
 
@@ -917,7 +975,7 @@ function formatReference(ref) {
       .classed("sortable", true)
       .append("span")
       .attr("class", "sort-symbol")
-      .html(" ▲");
+      .html(defaultSortSymbol);
 
     th
       .style("cursor", "pointer")
@@ -927,7 +985,7 @@ function formatReference(ref) {
 
   function updateSortSymbols() {
   d3.selectAll("th .sort-symbol")
-    .html(" ▲")
+    .html(defaultSortSymbol)
     .classed("active", false);
 
   if (!sortState.key) return;
@@ -935,7 +993,7 @@ function formatReference(ref) {
   const idx = columns.findIndex(c => c.key === sortState.key);
   if (idx < 0 || !columns[idx].sortable) return;
 
-  const symbol = sortState.asc ? " ▲" : " ▼";
+  const symbol = sortState.asc ? ascendingSortSymbol : descendingSortSymbol;
 
   d3.select(d3.selectAll("th").nodes()[idx])
     .select(".sort-symbol")
@@ -957,22 +1015,31 @@ function formatReference(ref) {
   function compareRows(a, b) {
     if (!sortState.key) return 0;
 
-    let va = a[sortState.key] ?? "";
-    let vb = b[sortState.key] ?? "";
+    const va = a.__sortValues?.[sortState.key] ?? null;
+    const vb = b.__sortValues?.[sortState.key] ?? null;
+    const aMissing = va == null;
+    const bMissing = vb == null;
 
-    va = stripFormatting(va);
-    vb = stripFormatting(vb);
+    if (aMissing || bMissing) {
+      if (aMissing && bMissing) {
+        return a.__originalIndex - b.__originalIndex;
+      }
 
-    const na = parseFloat(va);
-    const nb = parseFloat(vb);
-
-    if (!isNaN(na) && !isNaN(nb)) {
-      return sortState.asc ? na - nb : nb - na;
+      return aMissing ? 1 : -1;
     }
 
-    return sortState.asc
-      ? va.localeCompare(vb)
-      : vb.localeCompare(va);
+    let result;
+    if (sortTypes[sortState.key] === "number") {
+      result = va - vb;
+    } else {
+      result = sortCollator.compare(va, vb);
+    }
+
+    if (result === 0) {
+      return a.__originalIndex - b.__originalIndex;
+    }
+
+    return sortState.asc ? result : -result;
   }
 
   function getFilteredData() {
@@ -1057,7 +1124,12 @@ function formatReference(ref) {
   // ---- Sorting logic ----
   function sortBy(key) {
     if (sortState.key === key) {
-      sortState.asc = !sortState.asc;
+      if (sortState.asc) {
+        sortState.asc = false;
+      } else {
+        sortState.key = null;
+        sortState.asc = true;
+      }
     } else {
       sortState.key = key;
       sortState.asc = true;
@@ -1070,15 +1142,6 @@ function formatReference(ref) {
   searchBox.on("input", function () {
     refreshTable();
   });
-  
-  // ---- Strip formatting for numeric sorting ----
-  function stripFormatting(value) {
-    return value
-      .toString()
-      .replace(/[×±()<>]/g, "")
-      .replace(/10[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+/g, "")
-      .trim();
-  }
   
   // ---- Initial render ----
   refreshTable();
