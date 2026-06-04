@@ -822,11 +822,20 @@ function formatReference(ref) {
   const entries = ref.split(";").map(e => e.trim()).filter(Boolean);
 
   const links = entries.map(entry => {
-    // Expect format: label:arxivID
-    const [label, arxiv] = entry.split(":").map(s => s.trim());
-    if (!label || !arxiv) return entry;
+    // Supported formats:
+    // - label:arxivID
+    // - label:doi:doiID
+    const [label, targetTypeOrArxiv, ...rest] = entry.split(":").map(s => s.trim());
+    if (!label || !targetTypeOrArxiv) return entry;
 
-    return `<a href="https://arxiv.org/abs/${arxiv}" target="_blank" title="arXiv:${arxiv}">${label}</a>`;
+    if (targetTypeOrArxiv.toLowerCase() === "doi") {
+      const doi = rest.join(":");
+      if (!doi) return entry;
+
+      return `<a href="https://doi.org/${doi}" target="_blank" title="DOI:${doi}">${label}</a>`;
+    }
+
+    return `<a href="https://arxiv.org/abs/${targetTypeOrArxiv}" target="_blank" title="arXiv:${targetTypeOrArxiv}">${label}</a>`;
   });
 
   return links.join(", ");
