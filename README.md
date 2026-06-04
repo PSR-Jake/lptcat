@@ -20,6 +20,7 @@ The catalog includes, when available:
 - Spin period and spin-down constraints
 - Dispersion measure (DM) and rotation measure (RM)
 - Duty cycle
+- Total, linear, and circular polarization fractions
 - Notes
 - Discovery and follow-up references
 

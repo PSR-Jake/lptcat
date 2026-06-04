@@ -1,4 +1,5 @@
 Date,Description
+2026-06-04,"Added total, linear, and circular polarization fraction columns to the catalog table."
 2026-06-04,Added the discovery of <a href="https://doi.org/10.1038/s41550-026-02882-x" target="_blank">ASKAP J1745-5051</a> as an accreting white dwarf binary LPT.
 2026-04-24,Added the reference of <a href="https://arxiv.org/abs/2604.18688" target="_blank">optical follow-up of ILT J1101+5521</a>.
 2026-04-08,Added the reference of <a href="https://arxiv.org/abs/2602.13742" target="_blank">FAST follow-up observations of GPM 1839-10</a>.

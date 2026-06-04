@@ -750,6 +750,9 @@ d3.csv("LPTs.csv").then(data => {
   { key: "DM", label: "DM (pc cm⁻³)", sortable: true },
   { key: "RM", label: "RM (rad m⁻²)", sortable: true },
   { key: "Duty cycle", label: "Duty cycle", sortable: false },
+  { key: "Total polarization fraction", label: "Total pol.", sortable: false },
+  { key: "Linear polarization fraction", label: "Linear pol.", sortable: false },
+  { key: "Circular polarization fraction", label: "Circular pol.", sortable: false },
   { key: "Notes", label: "Notes", sortable: false },
   { key: "References", label: "References", sortable: false }
 ];
