@@ -1,4 +1,6 @@
 Date,Description
+2026-06-19,Added the discovery of two <a href="https://arxiv.org/abs/2606.20067" target="_blank">VASTER long-period transients</a>.
+2026-06-19,Added total polarization fraction to the catalog table where available.
 2026-06-08,Added the reference of <a href="https://arxiv.org/abs/2606.05842" target="_blank">X-ray follow-up of ASKAP J1745-5051</a>.
 2026-06-04,Added linear and circular polarization fraction columns to the catalog table.
 2026-06-04,Added the discovery of <a href="https://arxiv.org/abs/2606.04232" target="_blank">ASKAP J1745-5051</a> as an accreting white dwarf binary LPT.
