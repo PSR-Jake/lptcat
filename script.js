@@ -498,7 +498,7 @@ function renderSkyMap(mapName, points, counts) {
     .attr("x", SKY_MAP_LAYOUT.width / 2)
     .attr("y", 46)
     .attr("text-anchor", "middle")
-    .text(`${counts.binary} WD-M dwarf binaries | ${counts.unknown} unknown progenitors`);
+    .text(`${counts.binary} WD binaries | ${counts.unknown} unknown progenitors`);
 
   svg.append("text")
     .attr("class", "sky-map-axis-label")
@@ -541,7 +541,7 @@ function renderSkyMap(mapName, points, counts) {
     .attr("class", "sky-map-legend-label")
     .attr("x", 20)
     .attr("y", 32)
-    .text("WD-M dwarf");
+    .text("WD binary");
 
   function buildCurve(constant, type) {
     const values = type === "meridian"
