@@ -37,12 +37,22 @@ lptcat/
 ├── LPTs.csv            # Main catalog data  
 ├── updates.csv         # Update history  
 ├── LPT_plots.ipynb     # Code for plots  
+├── plot_radio_transient_plane.py # Reproducible radio-transient plane
+├── data/radio_transient_plane/  # Pinned review data and cited additions
 ├── images/
 └── README.md  
 ```
 ---
 
 ## Usage
+
+### Reproduce the radio-transient plane
+
+Run `python plot_radio_transient_plane.py` with NumPy, pandas, and Matplotlib installed,
+or run the radio-transient-plane cell in `LPT_plots.ipynb`. The plot uses local data and
+saves `images/radio_transient_plane.png`; no live catalogue query is required.
+See [the data notes](data/radio_transient_plane/README.md) for upstream attribution,
+source coverage, distance assumptions, and pulse-width conventions.
 
 ### View the catalog
 Simply visit the live site:

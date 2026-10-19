@@ -1,4 +1,6 @@
 Date,Description
+2026-10-18,Added <a href="https://arxiv.org/abs/2609.11068" target="_blank">radio follow-up of ASKAP/DART J1832-0911</a> with updated polarization and phase-dependent RM. The study explores whether the source could be an ultra-compact asynchronous polar; this interpretation remains unconfirmed.
+2026-10-15,Added the radio-transient plane between the catalogue table and P–Ṗ diagram with cited pulse data including ASKAP J1745-5051 and LPT J1555-5631; sources without usable distance estimates are documented.
 2026-10-12,Added <a href="https://arxiv.org/abs/2609.34102" target="_blank">LPT J1555-5631</a> discovered in MeerKAT and ASKAP data.
 2026-09-30,Added <a href="https://arxiv.org/abs/2609.35980" target="_blank">optical and infrared follow-up of ASKAP J1448-68</a> identifying it as a cataclysmic variable.
 2026-09-22,Added <a href="https://arxiv.org/abs/2609.23259" target="_blank">FAST polarimetric follow-up of CHIME J0630+25</a> revealing extreme RM variability.
