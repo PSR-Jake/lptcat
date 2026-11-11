@@ -1,4 +1,5 @@
 Date,Description
+2026-11-11,Added <a href="https://arxiv.org/abs/2610.26128" target="_blank">GMRT follow-up of CHIME/ILT J1634+44</a> and updated its DM (Section 2.1) and period derivative (Section 3.3). The study reports a variable spectral turnover and finds the tested spin-orbit resonance models inconclusive.
 2026-10-18,Added <a href="https://arxiv.org/abs/2609.11068" target="_blank">radio follow-up of ASKAP/DART J1832-0911</a> with updated polarization and phase-dependent RM. The study explores whether the source could be an ultra-compact asynchronous polar; this interpretation remains unconfirmed.
 2026-10-15,Added the radio-transient plane between the catalogue table and P–Ṗ diagram with cited pulse data including ASKAP J1745-5051 and LPT J1555-5631; sources without usable distance estimates are documented.
 2026-10-12,Added <a href="https://arxiv.org/abs/2609.34102" target="_blank">LPT J1555-5631</a> discovered in MeerKAT and ASKAP data.
