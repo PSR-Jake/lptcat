@@ -1164,7 +1164,7 @@ function formatReference(ref) {
 
 d3.csv("updates.csv").then(updates => {
   const list = d3.select("#update-list");
-  const maxVisibleUpdates = 5;
+  const maxVisibleUpdates = 10;
   const latestUpdates = updates
     .slice()
     // Dates are stored as YYYY-MM-DD, so string sorting matches chronology.
