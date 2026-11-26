@@ -125,8 +125,6 @@ def make_radio_transient_plane():
         lpt_x.extend(px)
         lpt_y.extend(py)
 
-    # ASKAP J1745-5051 is omitted because its distance is poorly constrained;
-    # the retained pulse data and 0.4--9.1 kpc bounds are documented in the notes.
     ax.scatter(lpt_x, lpt_y, color=LPT_COLOR, marker="X", s=33,
                edgecolor="white", linewidth=0.25, alpha=0.9, zorder=5)
     ax.text(0.25, 2e3, "LONG-PERIOD TRANSIENTS", color=LPT_COLOR, fontsize=12)

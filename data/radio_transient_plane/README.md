@@ -78,8 +78,10 @@ estimated from the catalogue DM by this script.
 | ASKAP J1839−0756 | [Lee et al. (2025), Table 1 and Figure 4](https://arxiv.org/abs/2501.09133): the same 2024-02-18 main pulse at UHF (816 MHz, 1.8 Jy, FWHM 286.4 s) and S band (2187.5 MHz, 0.10 Jy, FWHM 148.4 s). The 3.7–4.2 kpc bounds span the two DM models, not a statistical interval. |
 | CHIME/ILT J1634+44 | [Dong et al. (2025), Table 2 and Appendix A.2](https://arxiv.org/abs/2507.05139): CHIME/Pulsar burst MJD 60336.66665, effective width 400 ms, peak Stokes I flux 12 Jy, nominal band centre 600 MHz. Bounds use this paper's 1.4–3.0 kpc NE2001/YMW16 estimates. |
 | LPT J1555−5631 | [Hyman et al. (2026), Table 2 and Section II.2](https://arxiv.org/abs/2609.34102): mean-profile MP/IP peaks 9.05/9.04 mJy and FWHM 2.438/0.663 min. Nominal frequency 1.3 GHz represents the combined ASKAP 1.367 GHz and MeerKAT L-band profile; it is not an independently fitted effective frequency. The **tentative** 5.4 kpc distance comes from neighbouring pulsars with comparable RM. The same green cross is used as for all other LPTs; no uncertainty interval is invented. |
+| GPM J071507−114153 | [McSweeney et al. (2026) pulse data](https://doi.org/10.5281/zenodo.21386095): MWA ObsID 1417371672 at 200.32 MHz. Effective width is fluence divided by fitted peak flux density. The 2.2–4.6 kpc endpoints use the Keck and Gaia distance estimate. |
+| ASKAP J1745−5051 | [Rose et al. (2026)](https://arxiv.org/abs/2606.04232), ATCA Epoch 1 (`obs1`, MJD 60161.402208): nominal 2.11 GHz from Table 1, duration 4.27777 min and Stokes I flux density 2.39748 mJy from the supplementary pulse table. The 0.25–0.39 kpc endpoints use the model-dependent SED estimate of 320 ± 70 pc from [Knigge et al. (2026), Section 5](https://arxiv.org/html/2606.28993v2#S5). |
 
-### Retained data: ASKAP J1745−5051 (not plotted)
+### Pulse data: ASKAP J1745−5051
 
 `j1745_pulses.csv` is an unchanged copy of
 [`Supplementary_Table_1.csv`, Zenodo record 17365566](https://zenodo.org/records/17365566)
@@ -88,12 +90,9 @@ the authors' dynamic-spectrum data and is licensed under
 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Credit Rose et al. and
 the linked Zenodo record when reusing these pulse data.
 
-The source is currently omitted from the radio-transient plane because the
-paper's conservative **0.4–9.1 kpc** distance bounds leave its pseudo-luminosity
-poorly constrained. Both formerly plotted distance endpoints for all 61 pulse
-rows are removed. The unchanged 62-row raw table remains available for provenance;
-it includes `obs2`, identified as quiescent in the paper. The main catalogue entry
-is retained.
+The plot uses the follow-up SED distance for the representative pulse listed
+above. The full 62-row table remains available for provenance and includes
+`obs2`, identified as quiescent in the discovery paper.
 
 ## Catalogue coverage and omissions
 
@@ -101,13 +100,12 @@ The inherited review pulse table covers GLEAM-X J1627−5235, GPM J1839−10,
 ASKAP J1935+2148, ILT J1101+5521, and ASKAP/DART J1832−0911. The upstream `grt`
 background point represents GCRT J1745−3009; its assumed distance is inherited
 from the review compilation and is not independently established here.
-Together with the five sources added above, **11 of the current 17 catalogue
+Together with the seven sources added above, **13 of the current 18 catalogue
 sources** are represented. The following are intentionally not placed at an
 invented distance or paired with an unrelated pulse measurement:
 
 | Source | Reason and reference |
 | --- | --- |
-| ASKAP J1745−5051 | Omitted because the conservative 0.4–9.1 kpc distance bounds in [Rose et al. (2026)](https://arxiv.org/abs/2606.04232) leave its position on the vertical axis poorly constrained. The raw pulse data are retained as described above. |
 | GLEAM-X J0704−37 | Absent from the upstream Figure 1 pulse table. The [discovery paper](https://arxiv.org/abs/2408.15757) reports a 30 s discovery pulse at 103–134 MHz and an adopted 1.5 ± 0.5 kpc distance, but no tabulated peak flux for that pulse. A matched calibrated pulse measurement is needed to add it. |
 | ASKAP J1448−6856 | No robust distance: [discovery](https://arxiv.org/abs/2507.13453) and [2026 optical follow-up, Section 3.3](https://arxiv.org/abs/2609.35980). The latter gives donor-model-dependent limits and a 1 kpc illustrative SED model, not a measured distance. |
 | ASKAP J1424−6126 | [Pritchard et al. (2026)](https://arxiv.org/abs/2603.07857) report DM ≈ 1400 pc cm⁻³ but explicitly allow intrinsic frequency-dependent morphology to mimic dispersion. No usable distance is supplied; we do not derive one from that ambiguous DM. |
